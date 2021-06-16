@@ -85,46 +85,65 @@ Section Lift.
     Qed.
 
 
-    Lemma L_ltHasDLub : ∃ m : L A, is_lub F m.
-    Proof.
-      unshelve esplit.
-      - unshelve esplit.
-        + apply: dlub directed_defd_fam.
-        + move=> Q.
-          suff: (exists! a : A, ∀ i x, F i x = a).
-          move=> /constructive_definite_description; by case.
-          rewrite <- (lub_unique _ _ _ (Σ_exists_is_lub _) (dlub_is_lub _ _)) in Q.
-          case: Q => //= i x.
-          exists (F i x); split.
-          * move=> j; move: x.
-            case: (predirected _ dirF i j) => k [ik jk] x y.
-            specialize (jk y).
-            specialize (ik x).
-            generalize y x.
-            rewrite ik jk.
-            move=> ? ?; f_equal; apply: proof_irrelevance.
-          * done.
-      - split.
-        + move=> i.
-          apply: L_make_lt; cbn.
-          move=> x.
-          unshelve esplit.
-          * apply: lub_intro.
-            -- apply: dlub_is_lub.
-            -- exact: x.
-          * rewrite /ssr_suff.
-            (* TODO: need to factor out the use of definite description to make this tractable. *)
-    Abort.
+   Definition candidate_dlub : dlub (push_fam (λ x : L A, defd x) F) directed_defd_fam → A.
+   Proof.
+     move=> Q.
+     apply: (iota (λ a, ∀ i x, F i x = a)).
+     rewrite <- (lub_unique _ _ _ (Σ_exists_is_lub _) (dlub_is_lub _ _)) in Q.
+     case: Q => //= i x.
+     exists (F i x); split.
+     - move=> j; move: x.
+       case: (predirected _ dirF i j) => k [ik jk] x y.
+       specialize (jk y).
+       specialize (ik x).
+       generalize y x.
+       rewrite ik jk.
+       move=> ? ?; f_equal; apply: proof_irrelevance.
+     - done.
+   Defined.
 
+   Definition candidate_dlub_compute : ∀ Q, ∀ i x, F i x = candidate_dlub Q.
+   Proof. move=> Q i x; apply: (iota_prop (λ a, ∀ i x, F i x = a)). Qed.
 
-    (** TODO, not proved yet. *)
-    Definition L_dlub : L A.
-    Proof.
-      unshelve esplit.
-      - apply: dlub directed_defd_fam.
-      - (* To do this, we need to be able to eliminate from an existential into a singleton --- the type will be a singleton ultimately because F is directed. *)
-    Abort.
-
+   (** This proof is totally horrible. *)
+   Lemma L_ltHasDLub : ∃ m : L A, is_lub F m.
+   Proof.
+     unshelve esplit.
+     - unshelve esplit.
+       + apply: dlub directed_defd_fam.
+       + apply: candidate_dlub.
+     - split.
+       + move=> i.
+         apply: L_make_lt; cbn.
+         move=> x.
+         unshelve esplit.
+         * apply: lub_intro.
+           -- apply: dlub_is_lub.
+           -- exact: x.
+         * by rewrite -(candidate_dlub_compute _ i x).
+       + move=> m H.
+         move=> //= x.
+         apply: L_ext.
+         * apply: above_lub; first by apply: dlub_is_lub.
+           move=> //= i; move=> z.
+           specialize (H i z).
+           by rewrite H in z.
+         * done.
+         * move=> //= H' H''.
+           rewrite /ssr_suff.
+           replace H'' with x; last by apply: proof_irrelevance.
+           rewrite <- (lub_unique _ _ _ (Σ_exists_is_lub _) (dlub_is_lub _ _)) in H''.
+           case: H'' => //= i z.
+           rewrite -(candidate_dlub_compute x i).
+           specialize (H i z).
+           generalize z.
+           rewrite H.
+           move=> ?.
+           f_equal.
+           apply: proof_irrelevance.
+   Qed.
   End Lub.
+
+  HB.instance Definition L_dpco_axioms := DcpoOfPoset.Build (L A) L_ltHasDLub.
 
 End Lift.
