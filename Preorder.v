@@ -24,6 +24,7 @@ HB.mixin Record PosetOfPreorder A of Preorder A :=
 
 HB.structure Definition Poset := {A of PosetOfPreorder A & Preorder A}.
 
+Hint Extern 0 => apply: ltR.
 
 Section Bottom.
   Context {A : Poset.type}.
@@ -151,21 +152,7 @@ Definition leq_family {D : Dcpo.type} (x y : D) : Family D.
 Defined.
 
 Lemma leq_family_directed {D : Dcpo.type} : ∀ x y : D, x ≤ y → is_directed (leq_family x y).
-Proof.
-  move=> x y.
-  split.
-  - by exists true.
-  - move=> //=.
-    case.
-    + case.
-      * exists true; split; apply: ltR.
-      * exists false; split; first by auto.
-        apply: ltR.
-    + case.
-      * exists false; split; auto.
-        apply: ltR.
-      * exists false; split; apply: ltR.
-Qed.
+Proof. move=> *; split; repeat case; try (by [exists true] + by [exists false]). Qed.
 
 Lemma leq_to_lub {D : Dcpo.type} : ∀ x y : D, ∀ p : x ≤ y, y = dlub (leq_family x y) (leq_family_directed x y p).
 Proof.
