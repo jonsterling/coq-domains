@@ -6,7 +6,8 @@ HB.mixin Record PosetOfPreorder A of Preorder A :=
 
 HB.structure Definition Poset := {A of PosetOfPreorder A & Preorder A}.
 
-Hint Extern 0 => apply: ltR.
+#[export]
+Hint Resolve ltR : core.
 
 Section Extrema.
   Context {A : Poset.type}.

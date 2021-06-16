@@ -47,21 +47,20 @@ Section PathFromLt.
   Proof.
     move=> A dirA.
     split.
-    - move=> //= u; apply: above_lub; first by apply: dlub_is_lub.
+    - move=> //= u; apply: above_lub; auto.
       case; cbn.
       + move=> s.
         apply: ltT'.
-        * apply: dlub_is_ub; left; apply: lub_intro; [apply: dlub_is_lub | exact: s].
+        * apply: dlub_is_ub; left; apply: lub_intro; eauto.
         * done.
       + move=> _.
         apply: ltT'.
-        apply: dlub_is_ub.
-        * by right.
+        * apply: dlub_is_ub.
+          by right.
         * done.
 
     - move=> z zub.
-      apply: lub_univ.
-      + apply: dlub_is_lub.
+      apply: lub_univ; auto.
       + case; cbn.
         * move=> h.
           suff: ∃ i, A i.
@@ -80,7 +79,6 @@ Section PathFromLt.
         * move=> _.
           case: dirA => [[i _] h].
           apply: ltT; last by apply: zub.
-          cbn.
           apply: ltT'.
           -- apply: dlub_is_ub; by right.
           -- done.
@@ -104,25 +102,22 @@ Infix "⟿" := HasPath (at level 10).
 Lemma fwd : ∀ x y : D, x ≤ y → x ⟿ y.
 Proof.
   move=> x y xy.
-  unshelve esplit.
-  - apply: make_path xy.
-  - split; cbn.
-    + apply: lub_unique; first by apply: dlub_is_lub.
-      split.
-      * case; last by done.
-        by rewrite Σ_bot_rw.
-      * move=> z h.
-        apply: ltT'.
-        -- apply: h.
-           by right.
-        -- done.
-    + apply: lub_unique; first by apply: dlub_is_lub.
-      split; first by case.
-      move=> z h.
+  exists (make_path x y xy).
+  split; cbn.
+  - apply: lub_unique; auto.
+    split.
+    + case; last by done.
+      by rewrite Σ_bot_rw.
+    + move=> z h.
       apply: ltT'.
-      * apply: h; left.
-        by rewrite Σ_top_rw.
+      * by apply: h; right.
       * done.
+  - apply: lub_unique; auto.
+    split; first by case.
+    move=> z h.
+    apply: ltT'.
+    * by apply: h; left; rewrite Σ_top_rw.
+    * done.
 Qed.
 
 Lemma bwd : ∀ x y : D, x ⟿ y → x ≤ y.

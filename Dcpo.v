@@ -35,6 +35,11 @@ Section DLub.
   Opaque dlub.
 End DLub.
 
+
+#[export]
+Hint Resolve dlub_is_lub : core.
+
+
 Definition push_fam {D E : Poset.type} (f : D → E) (F : Family D) : Family E.
 Proof.
   exists (fam_ix F).
@@ -59,7 +64,7 @@ Proof. move=> *; split; repeat case; try (by [exists true] + by [exists false]).
 Lemma leq_to_lub {D : Dcpo.type} : ∀ x y : D, ∀ p : x ≤ y, y = dlub (leq_family x y) (leq_family_directed x y p).
 Proof.
   move=> x y xy.
-  apply: (lub_unique (leq_family x y)); last by apply: dlub_is_lub.
+  apply: (lub_unique (leq_family x y)); auto.
   split.
   - case; [auto | apply: ltR].
   - move=> z hz.
