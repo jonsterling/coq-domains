@@ -120,6 +120,7 @@ Module OrderIsDcpo.
     Context (A : Family Rel) (dirA : is_directed A).
 
     Definition Rel_dlub : Rel.
+    Proof.
       unshelve esplit.
       - split.
         + unshelve apply: dlub.
