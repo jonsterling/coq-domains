@@ -52,3 +52,6 @@ Lemma Σ_bot_rw : (⊥ : Σ) = False.
   - apply: bottom_is_bottom.
   - by compute.
 Qed.
+
+Lemma lub_intro (A : Family Σ): ∀ u ϕ, is_lub A ϕ → A u → ϕ.
+Proof. move=> u ϕ ϕlub; by apply: (lub_is_ub A ϕ ϕlub u). Qed.

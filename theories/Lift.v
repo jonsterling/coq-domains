@@ -84,6 +84,39 @@ Section Lift.
         + move=> ?; by rewrite -jk.
     Qed.
 
+
+    Lemma L_ltHasDLub : ∃ m : L A, is_lub F m.
+    Proof.
+      unshelve esplit.
+      - unshelve esplit.
+        + apply: dlub directed_defd_fam.
+        + move=> Q.
+          suff: (exists! a : A, ∀ i x, F i x = a).
+          move=> /constructive_definite_description; by case.
+          rewrite <- (lub_unique _ _ _ (Σ_exists_is_lub _) (dlub_is_lub _ _)) in Q.
+          case: Q => //= i x.
+          exists (F i x); split.
+          * move=> j; move: x.
+            case: (predirected _ dirF i j) => k [ik jk] x y.
+            specialize (jk y).
+            specialize (ik x).
+            generalize y x.
+            rewrite ik jk.
+            move=> ? ?; f_equal; apply: proof_irrelevance.
+          * done.
+      - split.
+        + move=> i.
+          apply: L_make_lt; cbn.
+          move=> x.
+          unshelve esplit.
+          * apply: lub_intro.
+            -- apply: dlub_is_lub.
+            -- exact: x.
+          * rewrite /ssr_suff.
+            (* TODO: need to factor out the use of definite description to make this tractable. *)
+    Abort.
+
+
     (** TODO, not proved yet. *)
     Definition L_dlub : L A.
     Proof.

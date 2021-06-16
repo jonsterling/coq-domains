@@ -5,9 +5,6 @@ Context (D : Dcpo.type).
 Local Notation Σ := Sierpinski_Σ_canonical_Dcpo.
 Definition Path := map Σ D.
 
-Lemma lub_intro (A : Family Σ): ∀ u ϕ, is_lub A ϕ → A u → ϕ.
-Proof. move=> u ϕ ϕlub; by apply: (lub_is_ub A ϕ ϕlub u). Qed.
-
 Section PathFromLt.
   Context (x y : D) (xy : x ≤ y).
 
@@ -52,6 +49,7 @@ Section PathFromLt.
       + move=> s.
         apply: ltT'.
         * apply: dlub_is_ub; left; apply: lub_intro; eauto.
+          apply: dlub_is_lub.
         * done.
       + move=> _.
         apply: ltT'.
