@@ -27,6 +27,7 @@ html: $(COQMAKEFILE) $(VS)
 	rm -fr html
 	@$(MAKE) -f $(COQMAKEFILE) $@
 	cp $(EXTRA_DIR)/resources/* html
+	mv html docs
 
 $(COQMAKEFILE): $(COQ_PROJ) $(VS)
 		coq_makefile -f $(COQ_PROJ) $(VS_OTHER) -o $@
