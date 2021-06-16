@@ -1,6 +1,6 @@
 Require Import ssreflect Unicode.Utf8.
 From HB Require Import structures.
-Require Import Coq.Logic.Description Coq.Logic.PropExtensionality.
+Require Import Coq.Logic.Description Coq.Logic.PropExtensionality Coq.Logic.FunctionalExtensionality.
 
 
 Set Primitive Projections.
@@ -156,6 +156,9 @@ Section DLub.
   Lemma dlub_is_lub : is_lub A dlub.
   Proof. rewrite /dlub; by case: dlub_bundled. Qed.
 
+  Lemma dlub_is_ub : is_ub A dlub.
+  Proof. rewrite /dlub; case: dlub_bundled => ? [? ?]; auto. Qed.
+
   Opaque dlub.
 End DLub.
 
@@ -170,11 +173,6 @@ Defined.
 Definition is_continuous {D E : Dcpo.type} (f : D → E) :=
   ∀ (A : Family D) (h : is_directed A),
     is_lub (push_fam f A) (f (dlub A h)).
-
-HB.mixin Record ContinuousMapOfFunction (D E : Dcpo.type) (f : D → E) :=
-  {map_continuous : is_continuous f}.
-
-HB.structure Definition ContinuousMap (D E : Dcpo.type) := {f of ContinuousMapOfFunction D E f}.
 
 Definition leq_family {D : Dcpo.type} (x y : D) : Family D.
   exists bool; case.
@@ -241,3 +239,74 @@ Module Σ.
   HB.instance Definition Σ_pointed_poset_axioms := PointedPosetOfPoset.Build Σ Σ_ltHasBot.
   HB.instance Definition Σ_bounded_poset_axioms := BoundedPosetOfPointedPoset.Build Σ Σ_ltHasTop.
 End Σ.
+
+
+Module Exponential.
+  Context (D E : Dcpo.type).
+
+  Definition map := {f : D → E | is_continuous f}.
+  Definition ap (f : map) : D → E := proj1_sig f.
+
+  Lemma map_ext : ∀ f g, ap f = ap g → f = g.
+  Proof.
+    rewrite /map.
+    move=> f g fg.
+    apply: eq_sig.
+    apply: proof_irrelevance.
+  Qed.
+
+  Definition map_lt (f g : map) : Prop :=
+    ∀ x, ap f x ≤ ap g x.
+
+  Lemma map_ltR : ∀ f, map_lt f f.
+  Proof. move=> f x; apply: ltR. Qed.
+
+  Lemma map_ltT : ∀ f g h, map_lt f g → map_lt g h → map_lt f h.
+  Proof.
+    move=> f g h fg gh x.
+    apply: ltT.
+    - apply: fg.
+    - apply: gh.
+  Qed.
+
+  HB.instance Definition map_preorder_axioms := PreorderOfType.Build map map_lt map_ltR map_ltT.
+
+  Lemma map_ltE : ∀ f g : map, f ≤ g → g ≤ f → f = g.
+  Proof.
+    move=> f g fg gf.
+    apply: map_ext.
+    extensionality x.
+    apply: ltE.
+    - apply: fg.
+    - apply: gf.
+  Qed.
+
+  HB.instance Definition map_poset_axioms := PosetOfPreorder.Build map map_ltE.
+
+  Lemma push_ap_directed : ∀ (A : Family map) (x : D), is_directed A → is_directed (push_fam (λ f, ap f x) A).
+  Proof.
+    move=> A x dir.
+    split.
+    - apply: nonempty dir.
+    - move=> //= i j.
+      case: (predirected A dir i j) => k [ij jk].
+      exists k; repeat split.
+      + apply: ij.
+      + apply: jk.
+  Qed.
+
+
+  Lemma map_ltHasDLubs : ∀ (A : Family map), is_directed A → ∃ f, is_lub A f.
+  Proof.
+    move=> A dir.
+    unshelve esplit.
+    - unshelve esplit.
+      + move=> x.
+        apply: dlub.
+        apply: push_ap_directed; eauto.
+      + move=> F dirF; split.
+        * move=> //= i.
+  Abort.
+  (* Time to get some sleep *)
+
+End Exponential.
