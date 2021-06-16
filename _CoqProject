@@ -10,4 +10,5 @@ theories/OrderSpace.v
 theories/Sierpinski.v
 theories/Path.v
 theories/Lift.v
+theories/ClosedModality.v
 
