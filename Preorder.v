@@ -144,6 +144,49 @@ HB.mixin Record ContinuousMapOfFunction (D E : Dcpo.type) (f : D → E) :=
 
 HB.structure Definition ContinuousMap (D E : Dcpo.type) := {f of ContinuousMapOfFunction D E f}.
 
+Definition leq_family {D : Dcpo.type} (x y : D) : Family D.
+  exists bool; case.
+  - exact: x.
+  - exact: y.
+Defined.
+
+Lemma leq_family_directed {D : Dcpo.type} : ∀ x y : D, x ≤ y → is_directed (leq_family x y).
+Proof.
+  move=> x y.
+  split.
+  - by exists true.
+  - move=> //=.
+    case.
+    + case.
+      * exists true; split; apply: ltR.
+      * exists false; split; first by auto.
+        apply: ltR.
+    + case.
+      * exists false; split; auto.
+        apply: ltR.
+      * exists false; split; apply: ltR.
+Qed.
+
+Lemma leq_to_lub {D : Dcpo.type} : ∀ x y : D, ∀ p : x ≤ y, y = dlub (leq_family x y) (leq_family_directed x y p).
+Proof.
+  move=> x y xy.
+  apply: (lub_unique (leq_family x y)); last by apply: dlub_is_lub.
+  split.
+  - case; [auto | apply: ltR].
+  - move=> z hz.
+    apply: hz false.
+Qed.
+
+
+Lemma continous_to_monotone {D E : Dcpo.type} (f : D → E) : is_continuous f → ∀ x y, x ≤ y → f x ≤ f y.
+Proof.
+  move=> fcont x y p.
+  rewrite (leq_to_lub x y p).
+  case: (fcont (leq_family x y) (leq_family_directed x y p)) => ub _.
+  apply: ub true.
+Qed.
+
+
 Module Σ.
   Definition Σ := Prop.
   Definition Σ_lt (x y : Σ) := x → y.
