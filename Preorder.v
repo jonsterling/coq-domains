@@ -135,17 +135,14 @@ Proof.
   exact: (F i).
 Defined.
 
-Definition is_continuous {D E : Poset.type} (f : D → E) :=
-  ∀ (A : Family D),
-    is_directed A
-    → ∀ x : D,
-      is_lub A x
-      → is_lub (push_fam f A) (f x).
+Definition is_continuous {D E : Dcpo.type} (f : D → E) :=
+  ∀ (A : Family D) (h : is_directed A),
+    is_lub (push_fam f A) (f (dlub A h)).
 
-HB.mixin Record ContinuousMapOfFunction (D E : Poset.type) (f : D → E) :=
+HB.mixin Record ContinuousMapOfFunction (D E : Dcpo.type) (f : D → E) :=
   {map_continuous : is_continuous f}.
 
-HB.structure Definition ContinuousMap (D E : Poset.type) := {f of ContinuousMapOfFunction D E f}.
+HB.structure Definition ContinuousMap (D E : Dcpo.type) := {f of ContinuousMapOfFunction D E f}.
 
 Module Σ.
   Definition Σ := Prop.
