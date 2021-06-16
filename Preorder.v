@@ -63,29 +63,34 @@ End Bottom.
 
 Notation "⊥" := bottom.
 
-Section DirectedDiagrams.
-  Context {A : Poset.type} (P : A → Prop).
+Record Family (A : Type) :=
+  {fam_ix : Type;
+   fam_val :> fam_ix → A}.
+
+Arguments fam_ix [_].
+Arguments fam_val [_] _.
+
+Section DirectedFamilies.
+  Context {A : Poset.type} (F : Family A).
 
   Definition is_nonempty : Prop :=
-    ∃ x : A, P x.
+    ∃ x : fam_ix F, True.
 
   Definition is_predirected : Prop :=
-    ∀ x y : A,
-      P x → P y →
-      ∃ z : A,
-        P z ∧
-        x ≤ z ∧ y ≤ z.
+    ∀ i j : fam_ix F,
+      ∃ k,
+        F i ≤ F k ∧ F j ≤ F k.
 
   Record is_directed : Prop :=
     {nonempty : is_nonempty;
      predirected : is_predirected}.
-End DirectedDiagrams.
+End DirectedFamilies.
 
 Section Lub.
-  Context {A : Poset.type} (P : A → Prop).
+  Context {A : Poset.type} (F : Family A).
 
   Definition is_ub (x : A) :=
-    ∀ z : A, P z → z ≤ x.
+    ∀ i, F i ≤ x.
 
   Definition is_lub (x : A) :=
     is_ub x ∧
@@ -96,13 +101,13 @@ Section Lub.
 End Lub.
 
 HB.mixin Record DcpoOfPoset D of Poset D :=
-  {ltHasDirLubs : ∀ (A : D → Prop), is_directed A → ∃ x, is_lub A x}.
+  {ltHasDirLubs : ∀ (A : Family D), is_directed A → ∃ x, is_lub A x}.
 
 HB.structure Definition Dcpo := {D of DcpoOfPoset D & Poset D}.
 HB.structure Definition Dcppo := {D of Dcpo D & PointedPoset D}.
 
 Section DLub.
-  Context {D : Dcpo.type} (A : D → Prop) (dir : is_directed A).
+  Context {D : Dcpo.type} (A : Family D) (dir : is_directed A).
 
   Definition dlub_bundled : {x : D | is_lub A x}.
   Proof.
@@ -122,13 +127,20 @@ Section DLub.
   Opaque dlub.
 End DLub.
 
+Definition push_fam {D E : Poset.type} (f : D → E) (F : Family D) : Family E.
+Proof.
+  exists (fam_ix F).
+  move=> i.
+  apply: f.
+  exact: (F i).
+Defined.
 
 Definition is_continuous {D E : Poset.type} (f : D → E) :=
-  ∀ (A : D → Prop),
+  ∀ (A : Family D),
     is_directed A
     → ∀ x : D,
       is_lub A x
-      → is_lub (λ e, ∃ x, e = f x /\ A x) (f x).
+      → is_lub (push_fam f A) (f x).
 
 HB.mixin Record ContinuousMapOfFunction (D E : Poset.type) (f : D → E) :=
   {map_continuous : is_continuous f}.
@@ -150,14 +162,14 @@ Module Σ.
 
   HB.instance Definition Σ_poset_axioms := PosetOfPreorder.Build Σ Σ_ltE.
 
-  Lemma Σ_ltHasDLubs : ∀ (A : Σ → Prop), is_directed A → ∃ x, is_lub A x.
+  Lemma Σ_ltHasDLubs : ∀ (A : Family Σ), is_directed A → ∃ x, is_lub A x.
   Proof.
     move=> A dir //=.
-    exists (∃ x : Σ, A x ∧ x).
+    exists (∃ x, A x).
     split; simpl.
     - rewrite /is_ub //=.
       by intuition; compute; eauto.
-    - move=> z zub; move=> [? [? ?]].
+    - move=> z zub; move=> [? ?].
       by apply: zub; eauto.
   Qed.
 
