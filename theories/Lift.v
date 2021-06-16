@@ -69,4 +69,29 @@ Section Lift.
   Qed.
 
   HB.instance Definition L_poset_axioms := PosetOfPreorder.Build (L A) L_ltE.
+
+  Section Lub.
+    Context (F : Family (L A)) (dirF : is_directed F).
+
+    Lemma directed_defd_fam : is_directed (push_fam (λ x : L A, defd x) F).
+    Proof.
+      split.
+      - case: (nonempty _ dirF); by cbn.
+      - move=> //= i j.
+        case: (predirected _ dirF i j) => k [ik jk].
+        exists k; split.
+        + move=> ?; by rewrite -ik.
+        + move=> ?; by rewrite -jk.
+    Qed.
+
+    (** TODO, not proved yet. *)
+    Definition L_dlub : L A.
+    Proof.
+      unshelve esplit.
+      - apply: dlub directed_defd_fam.
+      - (* To do this, we need to be able to eliminate from an existential into a singleton --- the type will be a singleton ultimately because F is directed. *)
+    Abort.
+
+  End Lub.
+
 End Lift.

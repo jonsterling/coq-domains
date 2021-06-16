@@ -35,6 +35,7 @@
 <span class="id" title="keyword">Set</span> <span class="id" title="var">Primitive</span> <span class="id" title="var">Projections</span>.<br/>
 
 <br/>
+<span class="comment">(*&nbsp;Using&nbsp;the&nbsp;partial&nbsp;map&nbsp;classifier,&nbsp;via&nbsp;de&nbsp;Jong&nbsp;and&nbsp;Escardo.&nbsp;*)</span><br/>
 <span class="id" title="keyword">Record</span> <a id="L" class="idref" href="#L"><span class="id" title="record">L</span></a> (<a id="A:1" class="idref" href="#A:1"><span class="id" title="binder">A</span></a> : <span class="id" title="keyword">Type</span>) :=<br/>
 &nbsp;&nbsp;{<a id="defd" class="idref" href="#defd"><span class="id" title="projection">defd</span></a> : <a class="idref" href="Domains.Sierpinski.html#e15c0eb40e61adefe95778c26e7840f6"><span class="id" title="definition">Σ</span></a>;<br/>
 &nbsp;&nbsp;&nbsp;<a id="run" class="idref" href="#run"><span class="id" title="projection">run</span></a> :&gt; <a class="idref" href="Domains.Lift.html#defd:3"><span class="id" title="method">defd</span></a> <a class="idref" href="http://coq.inria.fr/distrib/V8.13.2/stdlib//Coq.Unicode.Utf8_core.html#c41c566ddac4c1298b9e7dd2bae1c794"><span class="id" title="notation">→</span></a> <a class="idref" href="Domains.Lift.html#A:1"><span class="id" title="variable">A</span></a>}.<br/>
@@ -109,6 +110,41 @@
 
 <br/>
 &nbsp;&nbsp;<span class="id" title="var">HB.instance</span> <span class="id" title="keyword">Definition</span> <span class="id" title="var">L_poset_axioms</span> := <a class="idref" href="Domains.Poset.html#PosetOfPreorder.Build"><span class="id" title="abbreviation">PosetOfPreorder.Build</span></a> (<a class="idref" href="Domains.Lift.html#L"><span class="id" title="record">L</span></a> <a class="idref" href="Domains.Lift.html#Lift.A"><span class="id" title="variable">A</span></a>) <a class="idref" href="Domains.Lift.html#L_ltE"><span class="id" title="lemma">L_ltE</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Section</span> <a id="Lift.Lub" class="idref" href="#Lift.Lub"><span class="id" title="section">Lub</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Context</span> (<a id="F:24" class="idref" href="#F:24"><span class="id" title="binder">F</span></a> : <a class="idref" href="Domains.Poset.html#Family"><span class="id" title="record">Family</span></a> (<a class="idref" href="Domains.Lift.html#L"><span class="id" title="record">L</span></a> <a class="idref" href="Domains.Lift.html#Lift.A"><span class="id" title="variable">A</span></a>)) (<a id="dirF:25" class="idref" href="#dirF:25"><span class="id" title="binder">dirF</span></a> : <a class="idref" href="Domains.Poset.html#is_directed"><span class="id" title="record">is_directed</span></a> <a class="idref" href="Domains.Lift.html#F:24"><span class="id" title="variable">F</span></a>).<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a id="directed_defd_fam" class="idref" href="#directed_defd_fam"><span class="id" title="lemma">directed_defd_fam</span></a> : <a class="idref" href="Domains.Poset.html#is_directed"><span class="id" title="record">is_directed</span></a> (<a class="idref" href="Domains.Dcpo.html#push_fam"><span class="id" title="definition">push_fam</span></a> (<a class="idref" href="http://coq.inria.fr/distrib/V8.13.2/stdlib//Coq.Unicode.Utf8_core.html#bc1ad27deabe143d39d35abe6be2c1a4"><span class="id" title="notation">λ</span></a> <a id="x:26" class="idref" href="#x:26"><span class="id" title="binder">x</span></a> : <a class="idref" href="Domains.Lift.html#L"><span class="id" title="record">L</span></a> <a class="idref" href="Domains.Lift.html#Lift.A"><span class="id" title="variable">A</span></a><a class="idref" href="http://coq.inria.fr/distrib/V8.13.2/stdlib//Coq.Unicode.Utf8_core.html#bc1ad27deabe143d39d35abe6be2c1a4"><span class="id" title="notation">,</span></a> <a class="idref" href="Domains.Lift.html#defd"><span class="id" title="projection">defd</span></a> <a class="idref" href="Domains.Lift.html#x:26"><span class="id" title="variable">x</span></a>) <a class="idref" href="Domains.Lift.html#Lift.Lub.F"><span class="id" title="variable">F</span></a>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">split</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id" title="tactic">case</span>: (<a class="idref" href="Domains.Poset.html#nonempty"><span class="id" title="projection">nonempty</span></a> <span class="id" title="var">_</span> <a class="idref" href="Domains.Lift.html#Lift.Lub.dirF"><span class="id" title="variable">dirF</span></a>); <span class="id" title="tactic">by</span> <span class="id" title="var">cbn</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id" title="tactic">move</span>=&gt; //= <span class="id" title="var">i</span> <span class="id" title="var">j</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">case</span>: (<a class="idref" href="Domains.Poset.html#predirected"><span class="id" title="projection">predirected</span></a> <span class="id" title="var">_</span> <a class="idref" href="Domains.Lift.html#Lift.Lub.dirF"><span class="id" title="variable">dirF</span></a> <span class="id" title="var">i</span> <span class="id" title="var">j</span>) =&gt; <span class="id" title="var">k</span> [<span class="id" title="var">ik</span> <span class="id" title="var">jk</span>].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">exists</span> <span class="id" title="var">k</span>; <span class="id" title="tactic">split</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">move</span>=&gt; ?; <span class="id" title="tactic">by</span> <span class="id" title="tactic">rewrite</span> -<span class="id" title="var">ik</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">move</span>=&gt; ?; <span class="id" title="tactic">by</span> <span class="id" title="tactic">rewrite</span> -<span class="id" title="var">jk</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+TODO, not proved yet. 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a id="L_dlub" class="idref" href="#L_dlub"><span class="id" title="definition">L_dlub</span></a> : <a class="idref" href="Domains.Lift.html#L"><span class="id" title="record">L</span></a> <a class="idref" href="Domains.Lift.html#Lift.A"><span class="id" title="variable">A</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">unshelve</span> <span class="id" title="var">esplit</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id" title="tactic">apply</span>: <a class="idref" href="Domains.Dcpo.html#dlub"><span class="id" title="definition">dlub</span></a> <a class="idref" href="Domains.Lift.html#directed_defd_fam"><span class="id" title="lemma">directed_defd_fam</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="comment">(*&nbsp;To&nbsp;do&nbsp;this,&nbsp;we&nbsp;need&nbsp;to&nbsp;be&nbsp;able&nbsp;to&nbsp;eliminate&nbsp;from&nbsp;an&nbsp;existential&nbsp;into&nbsp;a&nbsp;singleton&nbsp;---&nbsp;the&nbsp;type&nbsp;will&nbsp;be&nbsp;a&nbsp;singleton&nbsp;ultimately&nbsp;because&nbsp;F&nbsp;is&nbsp;directed.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Abort</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">End</span> <a class="idref" href="Domains.Lift.html#Lift.Lub"><span class="id" title="section">Lub</span></a>.<br/>
+
+<br/>
 <span class="id" title="keyword">End</span> <a class="idref" href="Domains.Lift.html#Lift"><span class="id" title="section">Lift</span></a>.<br/>
 </div>
 </div>
