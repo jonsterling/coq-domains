@@ -122,6 +122,19 @@ Section DLub.
   Opaque dlub.
 End DLub.
 
+
+Definition is_continuous {D E : Poset.type} (f : D → E) :=
+  ∀ (A : D → Prop),
+    is_directed A
+    → ∀ x : D,
+      is_lub A x
+      → is_lub (λ e, ∃ x, e = f x /\ A x) (f x).
+
+HB.mixin Record ContinuousMapOfFunction (D E : Poset.type) (f : D → E) :=
+  {map_continuous : is_continuous f}.
+
+HB.structure Definition ContinuousMap (D E : Poset.type) := {f of ContinuousMapOfFunction D E f}.
+
 Module Σ.
   Definition Σ := Prop.
   Definition Σ_lt (x y : Σ) := x → y.
