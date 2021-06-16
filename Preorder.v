@@ -17,6 +17,9 @@ HB.mixin Record PreorderOfType A :=
 
 HB.structure Definition Preorder := {A of PreorderOfType A}.
 
+Lemma ltT' {A : Preorder.type} : ∀ x y z : A, lt y z → lt x y → lt x z.
+Proof. move=> *. apply: ltT; eauto. Qed.
+
 Infix "≤" := lt : preorder_scope.
 
 HB.mixin Record PosetOfPreorder A of Preorder A :=
@@ -124,9 +127,9 @@ Section Lub.
   Definition is_ub (x : A) :=
     ∀ i, F i ≤ x.
 
-  Definition is_lub (x : A) :=
-    is_ub x ∧
-    ∀ z : A, is_ub z → x ≤ z.
+  Record is_lub (x : A) :=
+    {lub_is_ub : is_ub x;
+     lub_univ : ∀ z : A, is_ub z → x ≤ z}.
 
   Lemma lub_unique : ∀ x y : A, is_lub x → is_lub y → x = y.
   Proof. move=> ? ? [? ?] [? ?]; apply: ltE; auto. Qed.
@@ -294,57 +297,66 @@ Module Exponential.
 
   HB.instance Definition map_poset_axioms := PosetOfPreorder.Build map map_ltE.
 
-  Lemma push_ap_directed : ∀ (A : Family map) (x : D), is_directed A → is_directed (push_fam (λ f, ap f x) A).
-  Proof.
-    move=> A x dir.
-    split.
-    - apply: nonempty dir.
-    - move=> //= i j.
-      case: (predirected A dir i j) => k [ij jk].
-      exists k; repeat split.
-      + apply: ij.
-      + apply: jk.
-  Qed.
+  Section Lub.
 
+    Context (A : Family map).
 
-  Lemma map_ltHasDLubs : ∀ (A : Family map), is_directed A → ∃ f, is_lub A f.
-  Proof.
-    move=> A dir.
-    unshelve esplit.
-    - unshelve esplit.
-      + move=> x.
-        apply: dlub.
-        apply: push_ap_directed; eauto.
-      + move=> F dirF; split.
-        * move=> //= i.
+    Lemma push_ap_directed : ∀ (x : D), is_directed A → is_directed (push_fam (λ f, ap f x) A).
+    Proof.
+      move=> x dir.
+      split.
+      - apply: nonempty dir.
+      - move=> //= i j.
+        case: (predirected A dir i j) => k [ij jk].
+        exists k; repeat split.
+        + apply: ij.
+        + apply: jk.
+    Qed.
+
+    Section Map.
+      Context (dir : is_directed A).
+      Definition dlub_fun : D → E :=
+        λ x,
+        dlub (push_fam (λ f, ap f x) A) (push_ap_directed x dir).
+
+      Lemma dlub_fun_continuous : is_continuous dlub_fun.
+      Proof.
+        move=> F dirF; split.
+        - move=> //= i.
           apply: above_ub.
-          -- apply: dlub_is_lub.
-          -- move=> //= z.
+          + apply: dlub_is_lub.
+          + move=> //= z.
              apply: ltT.
-             ++ apply: continuous_to_monotone.
-                ** by apply: ap_cont.
-                ** by apply: dlub_is_ub.
-             ++ apply: (dlub_is_ub (push_fam _ A)).
-        * move=> z //= H.
+             * apply: continuous_to_monotone.
+                -- by apply: ap_cont.
+                -- by apply: dlub_is_ub.
+             * apply: (dlub_is_ub (push_fam _ A)).
+        - move=> z //= H.
           apply: dlub_least.
           move=> //= x.
-          case: (ap_cont (A x) F dirF) => h0 h1.
-          apply: h1.
-          move=> //= y.
-          refine (ltT _ _ _ _ (H y)).
-          apply: (dlub_is_ub (push_fam _ A) _).
-    - split; simpl.
-      + move=> i.
-        rewrite /lt //= /map_lt; cbn.
-        move=> x.
-        apply: (dlub_is_ub (push_fam _ A) _) i.
-      + move=> f Hf.
-        rewrite /lt //= /map_lt; cbn.
-        move=> x.
-        apply: (dlub_least).
-        move=> //= i.
-        apply: Hf.
-  Qed.
+          apply: lub_univ.
+          + apply: ap_cont.
+          + move=> //= y.
+            apply: ltT'.
+            * by apply: H.
+            * by apply: (dlub_is_ub (push_fam _ A) _).
+      Qed.
+
+      Lemma map_ltHasDLubs : ∃ f, is_lub A f.
+      Proof.
+        unshelve esplit.
+        - unshelve esplit.
+          + by apply: dlub_fun.
+          + by apply: dlub_fun_continuous.
+        - split; simpl.
+          + move=> i; move=> ?.
+            apply: (dlub_is_ub (push_fam _ A) _) i.
+          + move=> f Hf; move=> ?.
+            apply: dlub_least => ?.
+            apply: Hf.
+      Qed.
+    End Map.
+  End Lub.
 
   HB.instance Definition map_dcpo_axioms := DcpoOfPoset.Build map map_ltHasDLubs.
 End Exponential.
