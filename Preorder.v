@@ -25,15 +25,17 @@ HB.mixin Record PosetOfPreorder A of Preorder A :=
 HB.structure Definition Poset := {A of PosetOfPreorder A & Preorder A}.
 
 Section DirectedDiagrams.
-  Context {A : Poset.type} {I : Type} (d : I → A).
+  Context {A : Poset.type} (P : A → Prop).
 
   Definition is_nonempty : Prop :=
-    ∃ x : I, True.
+    ∃ x : A, P x.
 
   Definition is_predirected : Prop :=
-    ∀ x y : I,
-      ∃ z : I,
-        d x ≤ d z ∧ d y ≤ d z.
+    ∀ x y : A,
+      P x → P y →
+      ∃ z : A,
+        P z ∧
+        x ≤ z ∧ y ≤ z.
 
   Record is_directed : Prop :=
     {nonempty : is_nonempty;
@@ -41,10 +43,10 @@ Section DirectedDiagrams.
 End DirectedDiagrams.
 
 Section Lub.
-  Context {A : Poset.type} {I : Type} (d : I → A).
+  Context {A : Poset.type} (P : A → Prop).
 
   Definition is_ub (x : A) :=
-    ∀ z : I, d z ≤ x.
+    ∀ z : A, P z → z ≤ x.
 
   Definition is_lub (x : A) :=
     is_ub x ∧
@@ -55,17 +57,17 @@ Section Lub.
 End Lub.
 
 HB.mixin Record DcpoOfPoset D of Poset D :=
-  {ltHasDirLubs : ∀ (I : Type) (A : I → D), is_directed A → ∃ x, is_lub A x}.
+  {ltHasDirLubs : ∀ (A : D → Prop), is_directed A → ∃ x, is_lub A x}.
 
 HB.structure Definition Dcpo := {D of DcpoOfPoset D & Poset D}.
 
 Section DLub.
-  Context {D : Dcpo.type} {I:Type} (d : I → D) (dir : is_directed d).
+  Context {D : Dcpo.type} (A : D → Prop) (dir : is_directed A).
 
-  Definition dlub_bundled : {x : D | is_lub d x}.
+  Definition dlub_bundled : {x : D | is_lub A x}.
   Proof.
     apply: constructive_definite_description.
-    case: (ltHasDirLubs I d dir) => //= x xlub.
+    case: (ltHasDirLubs A dir) => //= x xlub.
     exists x; split; first by done.
     move=> y ylub.
     apply: lub_unique; by eauto.
@@ -74,7 +76,7 @@ Section DLub.
   Definition dlub : D.
   Proof. case: dlub_bundled => x _; exact: x. Defined.
 
-  Lemma dlub_is_lub : is_lub d dlub.
+  Lemma dlub_is_lub : is_lub A dlub.
   Proof. rewrite /dlub; by case: dlub_bundled. Qed.
 
   Opaque dlub.
@@ -96,14 +98,17 @@ Module Σ.
 
   HB.instance Definition Σ_poset_axioms := PosetOfPreorder.Build Σ ltE.
 
-  Lemma ltHasDLubs : ∀ (I : Type) (d : I → Σ), is_directed d → ∃ x, is_lub d x.
-    move=> I d dir //=.
-    exists (∃ x : I, d x).
+  Lemma ltHasDLubs : ∀ (A : Σ → Prop), is_directed A → ∃ x, is_lub A x.
+  Proof.
+    move=> A dir //=.
+    exists (∃ x : Σ, A x ∧ x).
     split; simpl.
     - rewrite /is_ub //=.
       by intuition; compute; eauto.
-    - move=> z zub; move=> [? ?].
+    - move=> z zub; move=> [? [? ?]].
       by apply: zub; eauto.
   Qed.
 
-End Sierpinski.
+  HB.instance Definition Σ_dcpo_axioms := DcpoOfPoset.Build Σ ltHasDLubs.
+
+End Σ.
