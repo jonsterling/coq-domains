@@ -48,7 +48,7 @@ Section PathFromLt.
       case; cbn.
       + move=> s.
         apply: ltT'.
-        * apply: dlub_is_ub; left; apply: lub_intro; eauto.
+        * apply: dlub_is_ub; left; apply: Σ_lub_intro; eauto.
           apply: dlub_is_lub.
         * done.
       + move=> _.

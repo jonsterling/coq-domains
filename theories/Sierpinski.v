@@ -53,5 +53,13 @@ Lemma Σ_bot_rw : (⊥ : Σ) = False.
   - by compute.
 Qed.
 
-Lemma lub_intro (A : Family Σ): ∀ u ϕ, is_lub A ϕ → A u → ϕ.
+Lemma Σ_lub_intro (A : Family Σ): ∀ u ϕ, is_lub A ϕ → A u → ϕ.
 Proof. move=> u ϕ ϕlub; by apply: (lub_is_ub A ϕ ϕlub u). Qed.
+
+
+Lemma Σ_lub_elim {P Q: Σ} {A} : is_lub A P → (∀ x, A x → Q) → P → Q.
+Proof.
+  move=> H J.
+  rewrite -(lub_unique _ _ _ (Σ_exists_is_lub _) H).
+  case; apply: J.
+Qed.
