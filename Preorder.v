@@ -24,6 +24,22 @@ HB.mixin Record PosetOfPreorder A of Preorder A :=
 
 HB.structure Definition Poset := {A of PosetOfPreorder A & Preorder A}.
 
+
+Section Bottom.
+  Context {A : Poset.type}.
+  Definition is_bottom (x : A) := ∀ y : A, x ≤ y.
+
+  Lemma bottom_is_unique : ∀ x y, is_bottom x → is_bottom y → x = y.
+  Proof.
+    move=> x y xb yb.
+    apply: ltE.
+    - apply: xb.
+    - apply: yb.
+  Qed.
+End Bottom.
+
+
+
 Section DirectedDiagrams.
   Context {A : Poset.type} (P : A → Prop).
 
@@ -61,6 +77,11 @@ HB.mixin Record DcpoOfPoset D of Poset D :=
 
 HB.structure Definition Dcpo := {D of DcpoOfPoset D & Poset D}.
 
+HB.mixin Record DcppoOfDcpo D of Dcpo D :=
+  {ltHasBot : ∃ x : D, is_bottom x}.
+
+HB.structure Definition Dcppo := {D of DcppoOfDcpo D & Dcpo D}.
+
 Section DLub.
   Context {D : Dcpo.type} (A : D → Prop) (dir : is_directed A).
 
@@ -81,7 +102,6 @@ Section DLub.
 
   Opaque dlub.
 End DLub.
-
 
 Module Σ.
   Definition Σ := Prop.
@@ -111,4 +131,8 @@ Module Σ.
 
   HB.instance Definition Σ_dcpo_axioms := DcpoOfPoset.Build Σ ltHasDLubs.
 
+  Lemma ltHasBot : ∃ x : Σ, is_bottom x.
+  Proof. exists False; by move=> ?. Qed.
+
+  HB.instance Definition Σ_dcppo_axioms := DcppoOfDcpo.Build Σ ltHasBot.
 End Σ.
