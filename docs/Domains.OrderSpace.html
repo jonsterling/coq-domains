@@ -31,6 +31,14 @@
 <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="Domains.Preamble.html#"><span class="id" title="library">Preamble</span></a> <a class="idref" href="Domains.Preorder.html#"><span class="id" title="library">Preorder</span></a> <a class="idref" href="Domains.Poset.html#"><span class="id" title="library">Poset</span></a> <a class="idref" href="Domains.Dcpo.html#"><span class="id" title="library">Dcpo</span></a>.<br/>
 
 <br/>
+</div>
+
+<div class="doc">
+It is sometimes useful to be able to treat the underlying order relation of a dcpo as a dcpo. 
+</div>
+<div class="code">
+
+<br/>
 <span class="id" title="keyword">Context</span> {<a id="D:1" class="idref" href="#D:1"><span class="id" title="binder">D</span></a> : <a class="idref" href="Domains.Dcpo.html#Dcpo.type"><span class="id" title="record">Dcpo.type</span></a>}.<br/>
 <span class="id" title="keyword">Definition</span> <a id="Rel" class="idref" href="#Rel"><span class="id" title="definition">Rel</span></a> := <a class="idref" href="http://coq.inria.fr/distrib/V8.13.2/stdlib//Coq.Init.Specif.html#6556914db359db999889decec6a4a562"><span class="id" title="notation">{</span></a> <a id="p:2" class="idref" href="#p:2"><span class="id" title="binder">p</span></a> <a class="idref" href="http://coq.inria.fr/distrib/V8.13.2/stdlib//Coq.Init.Specif.html#6556914db359db999889decec6a4a562"><span class="id" title="notation">:</span></a> <a class="idref" href="Domains.OrderSpace.html#D"><span class="id" title="axiom">D</span></a> <a class="idref" href="http://coq.inria.fr/distrib/V8.13.2/stdlib//Coq.Init.Datatypes.html#11c698c8685bb8ab1cf725545c085ac4"><span class="id" title="notation">*</span></a> <a class="idref" href="Domains.OrderSpace.html#D"><span class="id" title="axiom">D</span></a> <a class="idref" href="http://coq.inria.fr/distrib/V8.13.2/stdlib//Coq.Init.Specif.html#6556914db359db999889decec6a4a562"><span class="id" title="notation">|</span></a> <a class="idref" href="http://coq.inria.fr/distrib/V8.13.2/stdlib//Coq.Init.Datatypes.html#fst"><span class="id" title="definition">fst</span></a> <a class="idref" href="Domains.OrderSpace.html#p:2"><span class="id" title="variable">p</span></a> <a class="idref" href="Domains.Preorder.html#c95735e1ce88a615473bb7a182512341"><span class="id" title="notation">≤</span></a> <a class="idref" href="http://coq.inria.fr/distrib/V8.13.2/stdlib//Coq.Init.Datatypes.html#snd"><span class="id" title="definition">snd</span></a> <a class="idref" href="Domains.OrderSpace.html#p:2"><span class="id" title="variable">p</span></a><a class="idref" href="http://coq.inria.fr/distrib/V8.13.2/stdlib//Coq.Init.Specif.html#6556914db359db999889decec6a4a562"><span class="id" title="notation">}</span></a>.<br/>
 

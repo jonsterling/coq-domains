@@ -1,5 +1,7 @@
 Require Import Preamble Preorder Poset Dcpo.
 
+(** It is sometimes useful to be able to treat the underlying order relation of a dcpo as a dcpo. *)
+
 Context {D : Dcpo.type}.
 Definition Rel := { p : D * D | fst p ≤ snd p}.
 
