@@ -27,7 +27,7 @@ Proof.
   move=> [[p1 p2] ?] [[q1 q2] ?].
   rewrite /Rel_lt /pi1 /pi2; cbn.
   move=> [pq1 pq2] [qp1 qp2].
-  apply: eq_sig; cbn; last by [move=> *; apply: proof_irrelevance].
+  apply: eq_sig; cbn; last by done.
   have: p1 = q1 ∧ p2 = q2; first by [split; apply: ltE].
   by case=> -> ->.
 Qed.

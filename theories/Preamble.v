@@ -36,3 +36,7 @@ Notation Im := Im.T.
 
 Notation propext := propositional_extensionality.
 Notation funext := functional_extensionality.
+Notation proofirr := proof_irrelevance.
+
+#[global]
+Hint Resolve proofirr : core.

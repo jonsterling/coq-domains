@@ -8,12 +8,7 @@ Section Map.
   Definition ap_cont (f : map) : is_continuous (ap f) := proj2_sig f.
 
   Lemma map_ext : ∀ f g, ap f = ap g → f = g.
-  Proof.
-    rewrite /map.
-    move=> f g fg.
-    apply: eq_sig.
-    apply: proof_irrelevance.
-  Qed.
+  Proof. rewrite /map; move=> f g fg; by apply: eq_sig. Qed.
 
   Definition map_lt (f g : map) : Prop :=
     ∀ x, ap f x ≤ ap g x.
@@ -70,14 +65,13 @@ Section Map.
       Proof.
         move=> F dirF; split.
         - move=> //= i.
-          apply: above_lub.
-          + apply: dlub_is_lub.
-          + move=> //= z.
-            apply: ltT.
-            * apply: continuous_to_monotone.
-              -- by apply: ap_cont.
-              -- by apply: dlub_is_ub.
-            * apply: (dlub_is_ub (push_fam _ A)).
+          apply: above_lub; first by auto.
+          move=> //= z.
+          apply: ltT.
+          + apply: continuous_to_monotone.
+            * by apply: ap_cont.
+            * by apply: dlub_is_ub.
+          + apply: (dlub_is_ub (push_fam _ A)).
         - move=> z //= H.
           apply: dlub_least.
           move=> //= x.

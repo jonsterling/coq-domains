@@ -1,5 +1,4 @@
 Require Import Preamble Preorder Poset Dcpo Sierpinski.
-Require Import Program.Equality.
 
 Set Primitive Projections.
 
@@ -19,8 +18,7 @@ Proof.
   have Q: rm = rn.
   - apply: funext => z.
     specialize (h z).
-    replace (p z) with z in h; first by auto.
-    apply: proof_irrelevance.
+    replace (p z) with z in h; done.
   - by rewrite Q.
 Qed.
 
@@ -50,9 +48,8 @@ Section Lift.
     - by move=> ?.
     - by move=> ?.
     - move=> p z.
-      replace (p z) with y; last by apply: proof_irrelevance.
-      replace z with x; last by apply: proof_irrelevance.
-      exact: H'.
+      replace (p z) with y; last by done.
+      replace z with x;done.
   Qed.
 
 
@@ -65,7 +62,7 @@ Section Lift.
     - move=> p x.
       specialize (mn x).
       dependent destruction mn.
-      by replace (p x) with x; last by apply: proof_irrelevance.
+      by replace (p x) with x.
   Qed.
 
   HB.instance Definition L_poset_axioms := PosetOfPreorder.Build (L A) L_ltE.
@@ -88,7 +85,7 @@ Section Lift.
     Definition candidate_dlub : dlub (push_fam (λ x : L A, defd x) F) directed_defd_fam → A.
     Proof.
       move=> Q; apply: (iota (λ a, ∀ i x, F i x = a)); move: Q.
-      apply: Σ_lub_elim; first by apply: dlub_is_lub.
+      apply: Σ_lub_elim; first by eauto.
       move=> //= i x.
       exists (F i x); split.
       - move=> j; move: x.
@@ -97,7 +94,7 @@ Section Lift.
         specialize (ik x).
         generalize y x.
         rewrite ik jk.
-        move=> ? ?; f_equal; apply: proof_irrelevance.
+        move=> ? ?; by f_equal.
       - done.
     Defined.
 
@@ -117,27 +114,25 @@ Section Lift.
           apply: L_make_lt; cbn.
           move=> x.
           unshelve esplit.
-          * apply: Σ_lub_intro.
-            -- apply: dlub_is_lub.
-            -- exact: x.
+          * apply: Σ_lub_intro; first by done.
+            exact: x.
           * by rewrite -(candidate_dlub_compute _ i x).
         + move=> m H.
           move=> //= x.
           apply: L_ext.
-          * apply: above_lub; first by apply: dlub_is_lub.
+          * apply: above_lub; first by done.
             move=> //= i; move=> z.
             specialize (H i z).
             by rewrite H in z.
           * done.
           * move=> //= H' H''.
-            replace H'' with x; [move: H'' | by apply: proof_irrelevance].
-            apply: Σ_lub_elim; first by apply: dlub_is_lub.
+            replace H'' with x; [move: H'' | done].
+            apply: Σ_lub_elim; first by done.
             move=> //= i z.
             rewrite -(candidate_dlub_compute x i).
             specialize (H i z).
             generalize z.
-            rewrite H.
-            move=> ?; f_equal; apply: proof_irrelevance.
+            rewrite H; move=> ?; by f_equal.
     Qed.
   End Lub.
 

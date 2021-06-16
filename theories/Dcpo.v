@@ -36,8 +36,8 @@ Section DLub.
 End DLub.
 
 
-#[export]
-Hint Resolve dlub_is_lub : core.
+#[global]
+Hint Extern 0 => apply: dlub_is_lub : core.
 
 
 Definition push_fam {D E : Poset.type} (f : D → E) (F : Family D) : Family E.

@@ -49,7 +49,6 @@ Section PathFromLt.
       + move=> s.
         apply: ltT'.
         * apply: dlub_is_ub; left; apply: Σ_lub_intro; eauto.
-          apply: dlub_is_lub.
         * done.
       + move=> _.
         apply: ltT'.
@@ -65,14 +64,11 @@ Section PathFromLt.
           -- move=> [i u].
              apply: ltT; last by apply: zub.
              apply: ltT'.
-             ++ apply: lub_is_ub.
-                apply: dlub_is_lub.
+             ++ apply: lub_is_ub; first by auto.
                 by left.
              ++ done.
-          -- apply: (lub_univ A).
-             ++ by apply: dlub_is_lub.
-             ++ apply: lub_is_ub.
-                apply: Σ_exists_is_lub.
+          -- apply: (lub_univ A); first by auto.
+             ++ apply: lub_is_ub; apply: Σ_exists_is_lub.
              ++ done.
         * move=> _.
           case: dirA => [[i _] h].
