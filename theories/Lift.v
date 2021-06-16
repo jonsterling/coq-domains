@@ -106,7 +106,6 @@ Section Lift.
 
     Opaque candidate_dlub.
 
-    (** This proof is totally horrible. *)
     Lemma L_ltHasDLub : ∃ m : L A, is_lub F m.
     Proof.
       unshelve esplit.
