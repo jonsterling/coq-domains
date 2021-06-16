@@ -326,7 +326,24 @@ Module Exponential.
                 ** by apply: dlub_is_ub.
              ++ apply: (dlub_is_ub (push_fam _ A)).
         * move=> z //= H.
-  Abort.
-  (* Time to get some sleep *)
+          apply: dlub_least.
+          move=> //= x.
+          case: (ap_cont (A x) F dirF) => h0 h1.
+          apply: h1.
+          move=> //= y.
+          refine (ltT _ _ _ _ (H y)).
+          apply: (dlub_is_ub (push_fam _ A) _).
+    - split; simpl.
+      + move=> i.
+        rewrite /lt //= /map_lt; cbn.
+        move=> x.
+        apply: (dlub_is_ub (push_fam _ A) _) i.
+      + move=> f Hf.
+        rewrite /lt //= /map_lt; cbn.
+        move=> x.
+        apply: (dlub_least).
+        move=> //= i.
+        apply: Hf.
+  Qed.
 
 End Exponential.
