@@ -26,9 +26,10 @@ HB.structure Definition Poset := {A of PosetOfPreorder A & Preorder A}.
 
 Hint Extern 0 => apply: ltR.
 
-Section Bottom.
+Section Extrema.
   Context {A : Poset.type}.
   Definition is_bottom (x : A) := ∀ y : A, x ≤ y.
+  Definition is_top (x : A) := ∀ y : A, y ≤ x.
 
   Lemma bottom_is_unique : ∀ x y, is_bottom x → is_bottom y → x = y.
   Proof.
@@ -37,12 +38,25 @@ Section Bottom.
     - apply: xb.
     - apply: yb.
   Qed.
-End Bottom.
+
+  Lemma top_is_unique : ∀ x y, is_top x → is_top y → x = y.
+  Proof.
+    move=> x y xt yt.
+    apply: ltE.
+    - apply: yt.
+    - apply: xt.
+  Qed.
+End Extrema.
 
 HB.mixin Record PointedPosetOfPoset A of Poset A :=
   {ltHasBot : ∃ x : A, is_bottom x}.
 
 HB.structure Definition PointedPoset := {A of PointedPosetOfPoset A & Poset A}.
+
+HB.mixin Record BoundedPosetOfPointedPoset A of PointedPoset A :=
+  {ltHasTop : ∃ x : A, is_top x}.
+
+HB.structure Definition BoundedPoset := {A of BoundedPosetOfPointedPoset A & PointedPoset A}.
 
 Section Bottom.
   Context {A : PointedPoset.type}.
@@ -59,10 +73,27 @@ Section Bottom.
   Definition bottom : A := proj1_sig bottom_bundled.
   Definition bottom_is_bottom : is_bottom bottom := proj2_sig bottom_bundled.
   Opaque bottom.
-
 End Bottom.
 
+Section Top.
+  Context {A : BoundedPoset.type}.
+
+  Definition top_bundled : {x : A | is_top x}.
+  Proof.
+    apply: constructive_definite_description.
+    case: (@ltHasTop A) => x xtop.
+    exists x; split; first by done.
+    move=> y ytop.
+    by apply: top_is_unique.
+  Qed.
+
+  Definition top : A := proj1_sig top_bundled.
+  Definition top_is_top : is_top top := proj2_sig top_bundled.
+  Opaque top.
+End Top.
+
 Notation "⊥" := bottom.
+Notation "⊤" := top.
 
 Record Family (A : Type) :=
   {fam_ix : Type;
@@ -194,8 +225,7 @@ Module Σ.
     move=> A dir //=.
     exists (∃ x, A x).
     split; simpl.
-    - rewrite /is_ub //=.
-      by intuition; compute; eauto.
+    - by compute; eauto.
     - move=> z zub; move=> [? ?].
       by apply: zub; eauto.
   Qed.
@@ -205,5 +235,9 @@ Module Σ.
   Lemma Σ_ltHasBot : ∃ x : Σ, is_bottom x.
   Proof. exists False; by move=> ?. Qed.
 
+  Lemma Σ_ltHasTop : ∃ x : Σ, is_top x.
+  Proof. exists True; by move=> ?. Qed.
+
   HB.instance Definition Σ_pointed_poset_axioms := PointedPosetOfPoset.Build Σ Σ_ltHasBot.
+  HB.instance Definition Σ_bounded_poset_axioms := BoundedPosetOfPointedPoset.Build Σ Σ_ltHasTop.
 End Σ.
