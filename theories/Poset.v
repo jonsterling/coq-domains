@@ -1,10 +1,12 @@
-Require Import Preamble.
-Require Import Preorder.
+From Domains Require Import Preamble Preorder.
 
 HB.mixin Record PosetOfPreorder A of Preorder A :=
   {ltE : ∀ x y : A, x ≤ y → y ≤ x → x = y}.
 
 HB.structure Definition Poset := {A of PosetOfPreorder A & Preorder A}.
+
+Definition is_monotone {D E : Poset.type} (f : D → E) :=
+  ∀ x y, x ≤ y → f x ≤ f y.
 
 #[export]
 Hint Resolve ltR : core.
@@ -17,17 +19,13 @@ Section Extrema.
   Lemma bottom_is_unique : ∀ x y, is_bottom x → is_bottom y → x = y.
   Proof.
     move=> x y xb yb.
-    apply: ltE.
-    - apply: xb.
-    - apply: yb.
+    by apply: ltE; [apply: xb | apply: yb].
   Qed.
 
   Lemma top_is_unique : ∀ x y, is_top x → is_top y → x = y.
   Proof.
     move=> x y xt yt.
-    apply: ltE.
-    - apply: yt.
-    - apply: xt.
+    by apply: ltE; [apply: yt | apply: xt].
   Qed.
 End Extrema.
 
@@ -48,8 +46,7 @@ Section Bottom.
   Proof.
     apply: constructive_definite_description.
     case: (@ltHasBot A) => x xbot.
-    exists x; split; first by done.
-    move=> y ybot.
+    exists x; split=>// y ybot.
     by apply: bottom_is_unique.
   Qed.
 
@@ -65,8 +62,7 @@ Section Top.
   Proof.
     apply: constructive_definite_description.
     case: (@ltHasTop A) => x xtop.
-    exists x; split; first by done.
-    move=> y ytop.
+    exists x; split=>// y ytop.
     by apply: top_is_unique.
   Qed.
 
@@ -113,8 +109,8 @@ Section Lub.
      lub_univ : ∀ z : A, is_ub z → x ≤ z}.
 
   Lemma lub_unique : ∀ x y : A, is_lub x → is_lub y → x = y.
-  Proof. move=> ? ? [? ?] [? ?]; apply: ltE; auto. Qed.
+  Proof. by move=> ?? [? Hx] [? Hy]; apply: ltE; [apply: Hx| apply: Hy]. Qed.
 
   Lemma above_lub : ∀ x y : A, is_lub x → (∀ z, F z ≤ y) → x ≤ y.
-  Proof. move=> x y [H0 H1] H2; apply: H1 H2. Qed.
+  Proof. by move=> ?? [?]; apply. Qed.
 End Lub.

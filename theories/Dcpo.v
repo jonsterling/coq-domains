@@ -1,6 +1,4 @@
-Require Import Preamble.
-Require Import Preorder.
-Require Import Poset.
+From Domains Require Import Preamble Preorder Poset.
 
 HB.mixin Record DcpoOfPoset D of Poset D :=
   {ltHasDirLubs : ∀ (A : Family D), is_directed A → ∃ x, is_lub A x}.
@@ -15,22 +13,21 @@ Section DLub.
   Proof.
     apply: constructive_definite_description.
     case: (ltHasDirLubs A dir) => //= x xlub.
-    exists x; split; first by done.
-    move=> y ylub.
-    apply: lub_unique; by eauto.
+    exists x; split=>// y ylub.
+    by apply: (lub_unique A).
   Qed.
 
   Definition dlub : D.
-  Proof. case: dlub_bundled => x _; exact: x. Defined.
+  Proof. by case: dlub_bundled. Defined.
 
   Lemma dlub_is_lub : is_lub A dlub.
-  Proof. rewrite /dlub; by case: dlub_bundled. Qed.
+  Proof. by rewrite /dlub; case: dlub_bundled. Qed.
 
   Lemma dlub_is_ub : is_ub A dlub.
-  Proof. rewrite /dlub; case: dlub_bundled => ? [? ?]; auto. Qed.
+  Proof. by rewrite /dlub; case: dlub_bundled => ? []. Qed.
 
   Lemma dlub_least : ∀ z : D, is_ub A z → dlub ≤ z.
-  Proof. rewrite /dlub; case: dlub_bundled => ? [? ?]; auto. Qed.
+  Proof. by rewrite /dlub; case: dlub_bundled => ? []. Qed.
 
   Opaque dlub.
 End DLub.
@@ -43,9 +40,7 @@ Hint Extern 0 => apply: dlub_is_lub : core.
 Definition push_fam {D E : Poset.type} (f : D → E) (F : Family D) : Family E.
 Proof.
   exists (fam_ix F).
-  move=> i.
-  apply: f.
-  exact: (F i).
+  by move=>?; apply/f/F.
 Defined.
 
 Definition is_continuous {D E : Dcpo.type} (f : D → E) :=
@@ -53,29 +48,27 @@ Definition is_continuous {D E : Dcpo.type} (f : D → E) :=
     is_lub (push_fam f A) (f (dlub A h)).
 
 Definition leq_family {D : Dcpo.type} (x y : D) : Family D.
-  exists bool; case.
-  - exact: x.
-  - exact: y.
+  by exists bool; case; [exact: x | exact: y].
 Defined.
 
 Lemma leq_family_directed {D : Dcpo.type} : ∀ x y : D, x ≤ y → is_directed (leq_family x y).
-Proof. move=> *; split; repeat case; try (by [exists true] + by [exists false]). Qed.
+Proof.
+  move=> *; split; first by exists true.
+  by do 2!case; exists false.
+Qed.
 
 Lemma leq_to_lub {D : Dcpo.type} : ∀ x y : D, ∀ p : x ≤ y, y = dlub (leq_family x y) (leq_family_directed x y p).
 Proof.
   move=> x y xy.
-  apply: (lub_unique (leq_family x y)); auto.
-  split.
-  - case; [auto | apply: ltR].
-  - move=> z hz.
-    apply: hz false.
+  apply: (lub_unique (leq_family x y)); last by apply: dlub_is_lub.
+  split; first by case.
+  by move=> z /(_ false).
 Qed.
 
-
-Lemma continuous_to_monotone {D E : Dcpo.type} (f : D → E) : is_continuous f → ∀ x y, x ≤ y → f x ≤ f y.
+Lemma continuous_to_monotone {D E : Dcpo.type} (f : D → E) : is_continuous f → is_monotone f.
 Proof.
   move=> fcont x y p.
   rewrite (leq_to_lub x y p).
-  case: (fcont (leq_family x y) (leq_family_directed x y p)) => ub _.
-  apply: ub true.
+  case: (fcont (leq_family x y) (leq_family_directed x y p))=> + _.
+  by move/(_ true).
 Qed.
