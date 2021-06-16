@@ -86,6 +86,7 @@ Section PathFromLt.
 
 
   Definition make_path : Path.
+  Proof.
     unshelve esplit.
     - move=> ϕ.
       apply: dlub.
@@ -121,6 +122,7 @@ Proof.
 Qed.
 
 Lemma bwd : ∀ x y : D, x ⟿ y → x ≤ y.
+Proof.
   move=> x y [α [<- <-]].
   apply: continuous_to_monotone.
   apply: ap_cont.
@@ -128,6 +130,7 @@ Lemma bwd : ∀ x y : D, x ⟿ y → x ≤ y.
 Qed.
 
 Lemma characterization : ∀ x y, (x ≤ y) = (x ⟿ y).
+Proof.
   move=> x y.
   apply: propositional_extensionality; split.
   - apply: fwd.
