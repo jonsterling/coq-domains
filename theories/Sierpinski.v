@@ -12,7 +12,7 @@ Proof. auto. Qed.
 HB.instance Definition Σ_preorder_axioms := PreorderOfType.Build Σ Σ_lt Σ_ltR Σ_ltT.
 
 Lemma Σ_ltE : ∀ x y : Σ, (x ≤ y) → (y ≤ x) → x = y.
-Proof. move=> *; apply: propositional_extensionality; by split. Qed.
+Proof. move=> *; apply: propext; by split. Qed.
 
 HB.instance Definition Σ_poset_axioms := PosetOfPreorder.Build Σ Σ_ltE.
 

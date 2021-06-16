@@ -33,3 +33,6 @@ Module Im.
 End Im.
 
 Notation Im := Im.T.
+
+Notation propext := propositional_extensionality.
+Notation funext := functional_extensionality.

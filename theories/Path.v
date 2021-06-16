@@ -130,7 +130,7 @@ Qed.
 Lemma characterization : ∀ x y, (x ≤ y) = (x ⟿ y).
 Proof.
   move=> x y.
-  apply: propositional_extensionality; split.
+  apply: propext; split.
   - apply: fwd.
   - apply: bwd.
 Qed.

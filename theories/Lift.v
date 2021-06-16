@@ -14,10 +14,10 @@ Arguments run [A] _.
 Lemma L_ext : ∀ A (m n : L A) (p : defd m ≤ defd n) (q : defd n ≤ defd m), (∀ x, m x = n (p x)) → m = n.
 Proof.
   move=> A [dm rm] [dn rn] //= p q h.
-  have Q: dm = dn; first by [apply: propositional_extensionality; split; auto].
+  have Q: dm = dn; first by [apply: propext; split; auto].
   dependent destruction Q.
   have Q: rm = rn.
-  - apply: functional_extensionality => z.
+  - apply: funext => z.
     specialize (h z).
     replace (p z) with z in h; first by auto.
     apply: proof_irrelevance.
