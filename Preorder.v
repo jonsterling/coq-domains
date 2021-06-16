@@ -121,6 +121,7 @@ Section DirectedFamilies.
      predirected : is_predirected}.
 End DirectedFamilies.
 
+
 Section Lub.
   Context {A : Poset.type} (F : Family A).
 
@@ -133,7 +134,11 @@ Section Lub.
 
   Lemma lub_unique : ∀ x y : A, is_lub x → is_lub y → x = y.
   Proof. move=> ? ? [? ?] [? ?]; apply: ltE; auto. Qed.
+
+  Lemma above_lub : ∀ x y : A, is_lub x → (∀ z, F z ≤ y) → x ≤ y.
+  Proof. move=> x y [H0 H1] H2; apply: H1 H2. Qed.
 End Lub.
+
 
 HB.mixin Record DcpoOfPoset D of Poset D :=
   {ltHasDirLubs : ∀ (A : Family D), is_directed A → ∃ x, is_lub A x}.
@@ -247,13 +252,6 @@ Module Σ.
 End Σ.
 
 
-
-Lemma above_ub {D : Poset.type} (A : Family D) : ∀ x y, is_lub A x → (∀ z, A z ≤ y) → x ≤ y.
-Proof.
-  move=> x y [H0 H1] H2.
-  apply: H1 H2.
-Qed.
-
 Module Exponential.
   Context (D E : Dcpo.type).
 
@@ -315,6 +313,7 @@ Module Exponential.
 
     Section Map.
       Context (dir : is_directed A).
+
       Definition dlub_fun : D → E :=
         λ x,
         dlub (push_fam (λ f, ap f x) A) (push_ap_directed x dir).
@@ -323,7 +322,7 @@ Module Exponential.
       Proof.
         move=> F dirF; split.
         - move=> //= i.
-          apply: above_ub.
+          apply: above_lub.
           + apply: dlub_is_lub.
           + move=> //= z.
              apply: ltT.
