@@ -38,7 +38,30 @@ Section Bottom.
   Qed.
 End Bottom.
 
+HB.mixin Record PointedPosetOfPoset A of Poset A :=
+  {ltHasBot : ∃ x : A, is_bottom x}.
 
+HB.structure Definition PointedPoset := {A of PointedPosetOfPoset A & Poset A}.
+
+Section Bottom.
+  Context {A : PointedPoset.type}.
+
+  Definition bottom_bundled : {x : A | is_bottom x}.
+  Proof.
+    apply: constructive_definite_description.
+    case: (@ltHasBot A) => x xbot.
+    exists x; split; first by done.
+    move=> y ybot.
+    by apply: bottom_is_unique.
+  Qed.
+
+  Definition bottom : A := proj1_sig bottom_bundled.
+  Definition bottom_is_bottom : is_bottom bottom := proj2_sig bottom_bundled.
+  Opaque bottom.
+
+End Bottom.
+
+Notation "⊥" := bottom.
 
 Section DirectedDiagrams.
   Context {A : Poset.type} (P : A → Prop).
@@ -76,11 +99,7 @@ HB.mixin Record DcpoOfPoset D of Poset D :=
   {ltHasDirLubs : ∀ (A : D → Prop), is_directed A → ∃ x, is_lub A x}.
 
 HB.structure Definition Dcpo := {D of DcpoOfPoset D & Poset D}.
-
-HB.mixin Record DcppoOfDcpo D of Dcpo D :=
-  {ltHasBot : ∃ x : D, is_bottom x}.
-
-HB.structure Definition Dcppo := {D of DcppoOfDcpo D & Dcpo D}.
+HB.structure Definition Dcppo := {D of Dcpo D & PointedPoset D}.
 
 Section DLub.
   Context {D : Dcpo.type} (A : D → Prop) (dir : is_directed A).
@@ -105,20 +124,20 @@ End DLub.
 
 Module Σ.
   Definition Σ := Prop.
-  Definition lt (x y : Σ) := x → y.
-  Lemma ltR : ∀ x : Σ, x → x.
+  Definition Σ_lt (x y : Σ) := x → y.
+  Lemma Σ_ltR : ∀ x : Σ, x → x.
   Proof. auto. Qed.
-  Lemma ltT : ∀ x y z : Σ, (x → y) → (y → z) → x → z.
+  Lemma Σ_ltT : ∀ x y z : Σ, (x → y) → (y → z) → x → z.
   Proof. auto. Qed.
 
-  HB.instance Definition Σ_preorder_axioms := PreorderOfType.Build Σ lt ltR ltT.
+  HB.instance Definition Σ_preorder_axioms := PreorderOfType.Build Σ Σ_lt Σ_ltR Σ_ltT.
 
-  Lemma ltE : ∀ x y : Σ, (x ≤ y) → (y ≤ x) → x = y.
+  Lemma Σ_ltE : ∀ x y : Σ, (x ≤ y) → (y ≤ x) → x = y.
   Proof. move=> *; apply: propositional_extensionality; by split. Qed.
 
-  HB.instance Definition Σ_poset_axioms := PosetOfPreorder.Build Σ ltE.
+  HB.instance Definition Σ_poset_axioms := PosetOfPreorder.Build Σ Σ_ltE.
 
-  Lemma ltHasDLubs : ∀ (A : Σ → Prop), is_directed A → ∃ x, is_lub A x.
+  Lemma Σ_ltHasDLubs : ∀ (A : Σ → Prop), is_directed A → ∃ x, is_lub A x.
   Proof.
     move=> A dir //=.
     exists (∃ x : Σ, A x ∧ x).
@@ -129,10 +148,10 @@ Module Σ.
       by apply: zub; eauto.
   Qed.
 
-  HB.instance Definition Σ_dcpo_axioms := DcpoOfPoset.Build Σ ltHasDLubs.
+  HB.instance Definition Σ_dcpo_axioms := DcpoOfPoset.Build Σ Σ_ltHasDLubs.
 
-  Lemma ltHasBot : ∃ x : Σ, is_bottom x.
+  Lemma Σ_ltHasBot : ∃ x : Σ, is_bottom x.
   Proof. exists False; by move=> ?. Qed.
 
-  HB.instance Definition Σ_dcppo_axioms := DcppoOfDcpo.Build Σ ltHasBot.
+  HB.instance Definition Σ_pointed_poset_axioms := PointedPosetOfPoset.Build Σ Σ_ltHasBot.
 End Σ.
