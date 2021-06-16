@@ -24,8 +24,9 @@ clean: $(COQMAKEFILE)
 	rm -f $(COQMAKEFILE)
 
 html: $(COQMAKEFILE) $(VS)
-	rm -fr html
+	rm -fr html docs
 	@$(MAKE) -f $(COQMAKEFILE) $@
+	cp $(EXTRA_DIR)/index.html html
 	cp $(EXTRA_DIR)/resources/* html
 	mv html docs
 
