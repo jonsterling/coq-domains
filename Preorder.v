@@ -346,4 +346,5 @@ Module Exponential.
         apply: Hf.
   Qed.
 
+  HB.instance Definition map_dcpo_axioms := DcpoOfPoset.Build map map_ltHasDLubs.
 End Exponential.
