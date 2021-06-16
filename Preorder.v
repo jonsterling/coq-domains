@@ -159,6 +159,9 @@ Section DLub.
   Lemma dlub_is_ub : is_ub A dlub.
   Proof. rewrite /dlub; case: dlub_bundled => ? [? ?]; auto. Qed.
 
+  Lemma dlub_least : ∀ z : D, is_ub A z → dlub ≤ z.
+  Proof. rewrite /dlub; case: dlub_bundled => ? [? ?]; auto. Qed.
+
   Opaque dlub.
 End DLub.
 
@@ -194,7 +197,7 @@ Proof.
 Qed.
 
 
-Lemma continous_to_monotone {D E : Dcpo.type} (f : D → E) : is_continuous f → ∀ x y, x ≤ y → f x ≤ f y.
+Lemma continuous_to_monotone {D E : Dcpo.type} (f : D → E) : is_continuous f → ∀ x y, x ≤ y → f x ≤ f y.
 Proof.
   move=> fcont x y p.
   rewrite (leq_to_lub x y p).
@@ -241,11 +244,19 @@ Module Σ.
 End Σ.
 
 
+
+Lemma above_ub {D : Poset.type} (A : Family D) : ∀ x y, is_lub A x → (∀ z, A z ≤ y) → x ≤ y.
+Proof.
+  move=> x y [H0 H1] H2.
+  apply: H1 H2.
+Qed.
+
 Module Exponential.
   Context (D E : Dcpo.type).
 
   Definition map := {f : D → E | is_continuous f}.
   Definition ap (f : map) : D → E := proj1_sig f.
+  Definition ap_cont (f : map) : is_continuous (ap f) := proj2_sig f.
 
   Lemma map_ext : ∀ f g, ap f = ap g → f = g.
   Proof.
@@ -306,6 +317,15 @@ Module Exponential.
         apply: push_ap_directed; eauto.
       + move=> F dirF; split.
         * move=> //= i.
+          apply: above_ub.
+          -- apply: dlub_is_lub.
+          -- move=> //= z.
+             apply: ltT.
+             ++ apply: continuous_to_monotone.
+                ** by apply: ap_cont.
+                ** by apply: dlub_is_ub.
+             ++ apply: (dlub_is_ub (push_fam _ A)).
+        * move=> z //= H.
   Abort.
   (* Time to get some sleep *)
 
