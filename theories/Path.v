@@ -24,19 +24,7 @@ Section PathFromLt.
     Proof.
       split.
       - unshelve esplit; [by right|done].
-      - case=> ?; case => ?; cbn.
-        + unshelve esplit.
-          * by left.
-          * done.
-        + unshelve esplit.
-          * by left.
-          * done.
-        + unshelve esplit.
-          * by left.
-          * done.
-        + unshelve esplit.
-          * by right.
-          * done.
+      - repeat (case=> ?); (unshelve esplit; [ by [left] + by [right] | done ]).
     Qed.
   End Family.
 
