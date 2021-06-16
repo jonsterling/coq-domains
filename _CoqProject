@@ -1,0 +1,11 @@
+-R theories/ Domains
+-arg -w
+-arg all
+theories/Preamble.v
+theories/Preorder.v
+theories/Poset.v
+theories/Dcpo.v
+theories/DcpoExponential.v
+theories/Sierpinski.v
+theories/Path.v
+
