@@ -93,4 +93,38 @@ Section Product.
         * apply: xub.
       + done.
   Qed.
+
+  Lemma pair_left_continous : ∀ x, is_continuous (pair x).
+  Proof.
+    move=> x.
+    split.
+    - move=> //= i; split; cbn; first by auto.
+      apply: dlub_is_ub.
+    - move=> z zub.
+      split; cbn.
+      + case: (nonempty _ h) => i _.
+        by case: (zub i).
+      + apply: dlub_least.
+        move=> i.
+        have: (z.1, A i) ≤ z.
+        * by case: (zub i).
+        * by case.
+  Qed.
+
+  Lemma pair_right_continous : ∀ x, is_continuous (fun y => pair y x).
+  Proof.
+    move=> x.
+    split.
+    - move=> //= i; split; cbn; last by auto.
+      apply: dlub_is_ub.
+    - move=> z zub.
+      split; cbn.
+      + apply: dlub_least.
+        move=> i.
+        have: (A i, z.2) ≤ z.
+        * by case: (zub i).
+        * by case.
+      + case: (nonempty _ h) => i _.
+        by case: (zub i).
+  Qed.
 End Product.

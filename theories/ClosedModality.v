@@ -142,7 +142,7 @@ Lemma seal_bot : is_bottom (@seal A ϕ ⊥).
         -- move=> ?; by rewrite /seal_bot_aux unseal_pt.
       * rewrite /seal_bot_aux'; symmetry.
         apply: (unseal_uniq (λ x, (seal ⊥, x))).
-        -- admit. (* pairs are continuous *)
+        -- apply: pair_left_continous.
         -- move=> a.
            by rewrite /seal_bot_aux_sl' /seal_bot_aux_sl.
         -- move=> z.
