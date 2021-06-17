@@ -13,13 +13,11 @@ Arguments run [A] _.
 Lemma L_ext : ∀ A (m n : L A) (p : defd m ≤ defd n) (q : defd n ≤ defd m), (∀ x, m x = n (p x)) → m = n.
 Proof.
   move=> A [dm rm] [dn rn] //= p q h.
-  have Q: dm = dn; first by [apply: propext; split; auto].
+  have Q: dm = dn by apply: propext.
   dependent destruction Q.
-  have Q: rm = rn.
-  - apply: funext => z.
-    specialize (h z).
-    replace (p z) with z in h; done.
-  - by rewrite Q.
+  rewrite (_ : rm = rn) //.
+  apply: funext => z.
+  by rewrite (h z) (_ : p z = z).
 Qed.
 
 Section Lift.
@@ -29,13 +27,12 @@ Section Lift.
     defd m → m = n.
 
   Lemma L_ltR : ∀ m, L_lt m m.
-  Proof. by compute. Qed.
+  Proof. by []. Qed.
 
   Lemma L_ltT : ∀ m n o, L_lt m n → L_lt n o → L_lt m o.
   Proof.
-    move=> m n o; compute; move=> mn no x.
-    rewrite mn; first by auto.
-    by rewrite no -?mn.
+    move=> m n o mn no x.
+    by rewrite mn // no -?mn.
   Qed.
 
   HB.instance Definition L_preorder_axioms := PreorderOfType.Build (L A) L_lt L_ltR L_ltT.
@@ -44,12 +41,9 @@ Section Lift.
   Proof.
     move=> H x.
     case: (H x) => y H'.
-    apply: L_ext.
-    - by move=> ?.
-    - by move=> ?.
-    - move=> p z.
-      replace (p z) with y; last by done.
-      replace z with x;done.
+    apply: L_ext; try by move=> ?.
+    move=> p z.
+    by rewrite (_ : p z = y) // (_ : z = x).
   Qed.
 
 
@@ -57,12 +51,12 @@ Section Lift.
   Proof.
     move=> mn nm.
     apply: L_ext.
-    - move=> ?; by rewrite <- mn.
-    - move=> ?; by rewrite <- nm.
+    - by move=> ?; rewrite -mn.
+    - by move=> ?; rewrite -nm.
     - move=> p x.
       specialize (mn x).
       dependent destruction mn.
-      by replace (p x) with x.
+      by rewrite (_ : p x = x).
   Qed.
 
   HB.instance Definition L_poset_axioms := PosetOfPreorder.Build (L A) L_ltE.
@@ -73,33 +67,30 @@ Section Lift.
     Lemma directed_defd_fam : is_directed (push_fam (λ x : L A, defd x) F).
     Proof.
       split.
-      - case: (nonempty _ dirF); by cbn.
+      - by case: (nonempty _ dirF).
       - move=> //= i j.
         case: (predirected _ dirF i j) => k [ik jk].
-        exists k; split.
-        + move=> ?; by rewrite -ik.
-        + move=> ?; by rewrite -jk.
+        exists k; split; move=>?.
+        + by rewrite -ik.
+        + by rewrite -jk.
     Qed.
 
 
     Definition candidate_dlub : dlub (push_fam (λ x : L A, defd x) F) directed_defd_fam → A.
     Proof.
       move=> Q; apply: (iota (λ a, ∀ i x, F i x = a)); move: Q.
-      apply: Σ_lub_elim; first by eauto.
-      move=> //= i x.
-      exists (F i x); split.
-      - move=> j; move: x.
-        case: (predirected _ dirF i j) => k [ik jk] x y.
-        specialize (jk y).
-        specialize (ik x).
-        generalize y x.
-        rewrite ik jk.
-        move=> ? ?; by f_equal.
-      - done.
+      apply: Σ_lub_elim=>//.
+      move=> /= i x.
+      exists (F i x); split=>//.
+      move=> j; move: x.
+      case: (predirected _ dirF i j) => k [ik jk] x y.
+      generalize y x.
+      rewrite (ik x) (jk y).
+      by move=> a b; rewrite (_ : a = b).
     Defined.
 
     Definition candidate_dlub_compute : ∀ Q, ∀ i x, F i x = candidate_dlub Q.
-    Proof. move=> Q i x; apply: (iota_prop (λ a, ∀ i x, F i x = a)). Qed.
+    Proof. by move=> Q i x; apply: (iota_prop (λ a, ∀ i x, F i x = a)). Qed.
 
     Opaque candidate_dlub.
 
@@ -107,32 +98,26 @@ Section Lift.
     Proof.
       unshelve esplit.
       - unshelve esplit.
-        + apply: dlub directed_defd_fam.
-        + apply: candidate_dlub.
+        + by apply: dlub directed_defd_fam.
+        + by apply: candidate_dlub.
       - split.
         + move=> i.
-          apply: L_make_lt; cbn.
-          move=> x.
+          apply: L_make_lt =>/= x.
           unshelve esplit.
-          * apply: Σ_lub_intro; first by done.
-            exact: x.
+          * apply: Σ_lub_intro=>//.
+            by exact: x.
           * by rewrite -(candidate_dlub_compute _ i x).
-        + move=> m H.
-          move=> //= x.
-          apply: L_ext.
-          * apply: above_lub; first by done.
-            move=> //= i; move=> z.
-            specialize (H i z).
-            by rewrite H in z.
-          * done.
-          * move=> //= H' H''.
-            replace H'' with x; [move: H'' | done].
-            apply: Σ_lub_elim; first by done.
-            move=> //= i z.
+        + move=> m H; move=> //= x.
+          apply: L_ext=>//.
+          * apply: above_lub=>//=.
+            move=> i; move=> z.
+            by rewrite -(H i z).
+          * move=> /= H' H''.
+            rewrite (_ : H'' = x) //; move: H''.
+            apply: Σ_lub_elim=>//= i z.
             rewrite -(candidate_dlub_compute x i).
-            specialize (H i z).
             generalize z.
-            rewrite H; move=> ?; by f_equal.
+            by rewrite (H i z)=> ?; f_equal.
     Qed.
   End Lub.
 

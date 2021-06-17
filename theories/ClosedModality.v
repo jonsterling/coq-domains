@@ -1,6 +1,6 @@
 (** EXPERIMENTAL. This file is a mess, don't look at it! LOL *)
 
-Require Import Preamble Preorder Poset Dcpo DcpoProduct OrderSpace.
+From Domains Require Import Preamble Preorder Poset Dcpo DcpoProduct OrderSpace.
 
 Axiom T : Dcpo.type → Prop → Dcpo.type.
 
@@ -134,8 +134,10 @@ Lemma seal_bot : is_bottom (@seal A ϕ ⊥).
       replace (seal ⊥, x) with (seal_bot_aux' x).
       * rewrite /seal_bot_aux'.
         apply: (unseal_uniq (fun x => pi (T A ϕ) (seal_bot_aux x))).
-        -- admit.
-           (* continuity closed under composition, product projections continuous. *)
+        -- apply: is_continuous_cmp.
+           ** apply: unseal_cont.
+           ** admit.
+           (* product projections continuous. *)
         -- move=> ?; by rewrite /seal_bot_aux unseal_seal.
         -- move=> ?; by rewrite /seal_bot_aux unseal_pt.
       * rewrite /seal_bot_aux'; symmetry.

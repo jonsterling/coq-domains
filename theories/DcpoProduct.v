@@ -1,23 +1,25 @@
-Require Import Preamble Preorder Poset Dcpo.
+From Domains Require Import Preamble Preorder Poset Dcpo.
 
 Section Product.
   Context (D E : Dcpo.type).
 
   Definition prod_lt (p q : prod D E) : Prop :=
-    fst p ≤ fst q
-    ∧ snd p ≤ snd q.
+    p.1 ≤ q.1 ∧ p.2 ≤ q.2.
 
   Lemma prod_ltR : ∀ p, prod_lt p p.
-  Proof. case; by split. Qed.
+  Proof. by []. Qed.
 
   Lemma prod_ltT : ∀ p q r, prod_lt p q → prod_lt q r → prod_lt p r.
-  Proof. move=> [x1 y1] [x2 y2] [x3 y3] [? ?] [? ?]; split; apply: ltT; eauto. Qed.
+  Proof.
+    by move=> [x1 y1][x2 y2][x3 y3][/= ? ?] [/= Hx Hy]; split=>/=;
+    [apply/ltT/Hx | apply/ltT/Hy].
+  Qed.
 
   HB.instance Definition prod_preorder_axioms := PreorderOfType.Build (prod D E) prod_lt prod_ltR prod_ltT.
 
   Lemma prod_ltE : ∀ p q, prod_lt p q → prod_lt q p → p = q.
   Proof.
-    move=> [? ?] [? ?] //= [//= h1 h2] [//= h'1 h'2].
+    move=> [? ?] [? ?] //= [/= h1 h2] [/= h'1 h'2].
     by rewrite (ltE _ _ h1 h'1) (ltE _ _ h2 h'2).
   Qed.
 
@@ -30,34 +32,28 @@ Section Product.
     Proof.
       split.
       - unshelve apply: dlub.
-        + apply: push_fam A; apply: fst.
+        + by apply: push_fam A; apply: fst.
         + split.
-          * case (nonempty A dirA) => i _; by exists i.
-          * move=> i j; case (predirected A dirA i j)=> k [[p1 p2] [q1 q2]]; exists k; by split.
+          * by case (nonempty A dirA) => i _; exists i.
+          * by move=> i j; case (predirected A dirA i j)=> k [[p1 p2] [q1 q2]]; exists k.
       - unshelve apply: dlub.
-        + apply: push_fam A; apply: snd.
+        + by apply: push_fam A; apply: snd.
         + split.
-          * case (nonempty A dirA) => i _; by exists i.
-          * move=> i j; case (predirected A dirA i j)=> k [[p1 p2] [q1 q2]]; exists k; by split.
+          * by case (nonempty A dirA) => i _; exists i.
+          * by move=> i j; case (predirected A dirA i j)=> k [[p1 p2] [q1 q2]]; exists k.
     Defined.
 
     Lemma prod_dlub_is_lub : is_lub A prod_dlub.
     Proof.
       split.
-      - move=> i; split.
-        + apply: ltT'.
-          * apply dlub_is_lub.
-          * apply: ltR.
-        + apply: ltT'.
-          * apply dlub_is_lub.
-          * apply: ltR.
-      - move=> //= [p1 p2] h; split; cbn;
-        (apply: lub_univ; first by auto);
-        move=> //= u; by case: (h u).
+      - move=> i; split;
+        by apply: ltT'; [apply dlub_is_lub | apply: ltR].
+      - move=> //= [p1 p2] h; split=>/=;
+        by apply: (lub_univ _)=>// u; case: (h u).
     Qed.
 
     Lemma prod_ltHasDLubs : ∃ x, is_lub A x.
-    Proof. exists prod_dlub; apply: prod_dlub_is_lub. Qed.
+    Proof. by exists prod_dlub; apply: prod_dlub_is_lub. Qed.
   End DLub.
 
   HB.instance Definition prod_dcpo_axioms := DcpoOfPoset.Build (prod D E) prod_ltHasDLubs.

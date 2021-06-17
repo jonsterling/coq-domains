@@ -1,4 +1,4 @@
-Require Import Preamble.
+From Domains Require Import Preamble.
 
 Declare Scope preorder_scope.
 Delimit Scope preorder_scope with P.
@@ -13,6 +13,6 @@ HB.mixin Record PreorderOfType A :=
 HB.structure Definition Preorder := {A of PreorderOfType A}.
 
 Lemma ltT' {A : Preorder.type} : ∀ x y z : A, lt y z → lt x y → lt x z.
-Proof. move=> *. apply: ltT; eauto. Qed.
+Proof. by move=>???/[swap]; exact: ltT. Qed.
 
 Infix "≤" := lt : preorder_scope.
