@@ -42,7 +42,8 @@ HB.instance Definition Σ_pointed_poset_axioms := PointedPosetOfPoset.Build Σ �
 HB.instance Definition Σ_bounded_poset_axioms := BoundedPosetOfPointedPoset.Build Σ Σ_ltHasTop.
 
 Lemma Σ_top_rw : (⊤ : Σ) = True.
-  apply: top_is_unique=>//.
+Proof.
+  apply: top_is_unique=>//=.
   by apply: top_is_top.
 Qed.
 

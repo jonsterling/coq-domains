@@ -29,16 +29,13 @@ Lemma seal_bot_aux_sl : A → Rel (T A ϕ).
 Proof.
   move=> a.
   exists (seal ⊥, seal a); cbn.
-  apply: continuous_to_monotone; first by apply: seal_cont.
-  apply: bottom_is_bottom.
+  by apply/continuous_to_monotone/bottom_is_bottom/seal_cont.
 Defined.
 
 Lemma seal_bot_aux_sl' : A → prod (T A ϕ) (T A ϕ).
 Proof.
   move=> a.
-  apply: pi.
-  apply: seal_bot_aux_sl.
-  exact: a.
+  by apply/pi/seal_bot_aux_sl/a.
 Defined.
 
 Lemma seal_bot_aux_sl'_cont : is_continuous seal_bot_aux_sl'.
@@ -64,7 +61,7 @@ Lemma seal_bot_aux_sl_cont : is_continuous seal_bot_aux_sl.
 Proof.
   split.
   - move=> //= u; split; cbn; auto.
-    apply: continuous_to_monotone; [apply: seal_cont | apply: dlub_is_ub].
+    by apply/continuous_to_monotone/dlub_is_ub/seal_cont.
   - move=> //= p H; split; cbn.
     + case: (nonempty _ h) => i _.
       apply: ltT'.
@@ -87,12 +84,7 @@ Proof.
 Defined.
 
 Definition seal_bot_aux_pt' : ϕ → prod (T A ϕ) (T A ϕ).
-Proof.
-  move=> x.
-  apply: pi.
-  apply: seal_bot_aux_pt.
-  exact: x.
-Defined.
+Proof. move=> x; by apply/pi/seal_bot_aux_pt/x. Defined.
 
 Lemma seal_bot_aux_gl : ∀ (x : A) (y : ϕ), seal_bot_aux_sl x = seal_bot_aux_pt y.
 Proof.

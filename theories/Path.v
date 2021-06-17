@@ -24,11 +24,7 @@ Section PathFromLt.
     Proof.
       split.
       - by exists (inr I).
-      - case=>a1; case=>a2 /=.
-        + by exists (inl a1).
-        + by exists (inl a1).
-        + by exists (inl a2).
-        + by exists (inr a2).
+      - by case=>a1; case=>a2 /=; (unshelve esplit; [left + right; assumption | eauto]).
     Qed.
   End Family.
 
@@ -54,7 +50,7 @@ Section PathFromLt.
           by apply/lub_is_ub/Σ_exists_is_lub.
       + move=> _.
         case: dirA => [[i _] h].
-        apply: ltT; last by apply: zub.
+        apply/ltT/zub; last by [].
         apply: ltT'.
         * by apply: dlub_is_ub; right.
         * by [].
@@ -90,8 +86,8 @@ Qed.
 
 Lemma bwd : ∀ x y : D, x ⟿ y → x ≤ y.
 Proof.
-  move=> x y [α [<- <-]].
-  by apply: continuous_to_monotone; [apply: ap_cont | apply: bottom_is_bottom].
+  move=> ? ? [? [<- <-]].
+  by apply/continuous_to_monotone/bottom_is_bottom/ap_cont.
 Qed.
 
 Lemma characterization : ∀ x y, (x ≤ y) = (x ⟿ y).
