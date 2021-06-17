@@ -43,9 +43,20 @@ Proof.
   by move=>?; apply/f/F.
 Defined.
 
+Definition is_continuous' {D E : Poset.type} (f : D → E) :=
+  ∀ (A : Family D) (h : is_directed A) x,
+    is_lub A x →
+    is_lub (push_fam f A) (f x).
+
+(** TODO: let's replace this with the above. *)
 Definition is_continuous {D E : Dcpo.type} (f : D → E) :=
   ∀ (A : Family D) (h : is_directed A),
     is_lub (push_fam f A) (f (dlub A h)).
+
+Definition is_monotone {D E : Poset.type} (f : D → E) :=
+  ∀ x y, x ≤ y → f x ≤ f y.
+
+
 
 Definition leq_family {D : Dcpo.type} (x y : D) : Family D.
   by exists bool; case; [exact: x | exact: y].
@@ -71,4 +82,39 @@ Proof.
   rewrite (leq_to_lub x y p).
   case: (fcont (leq_family x y) (leq_family_directed x y p))=> + _.
   by move/(_ true).
+Qed.
+
+Lemma monotone_preserves_directed {D E : Dcpo.type} {A : Family D} {f : D → E} : is_monotone f → is_directed A → is_directed (push_fam f A).
+Proof.
+  move=> mono dirA.
+  split.
+  + rewrite /is_nonempty /push_fam //=.
+    apply: nonempty dirA.
+  + move=> //= u v.
+    case: (predirected A dirA u v) => k [uk vk].
+    by exists k; split; apply: mono.
+Qed.
+
+Lemma relax_continuous {D E : Dcpo.type} {f : D → E} : is_continuous f → is_continuous' f.
+Proof.
+  rewrite /is_continuous.
+  move=> fcont A dirA x xlub.
+  replace x with (dlub A dirA).
+  - apply: fcont.
+  - apply: lub_unique; auto.
+Qed.
+
+Lemma is_continuous_cmp {D E F : Dcpo.type} (f : D → E) (g : E → F) : is_continuous f → is_continuous g → is_continuous (λ x, g (f x)).
+Proof.
+  move=> fcont gcont; split.
+  - move=> //= i.
+    apply: continuous_to_monotone; first by auto.
+    apply: (lub_is_ub _ _ (fcont A h)).
+  - move=> z H.
+    apply: lub_univ.
+    + pose gcont' := relax_continuous gcont.
+      apply: gcont'; last by auto.
+      apply: monotone_preserves_directed; last by auto.
+      by apply: continuous_to_monotone.
+    + done.
 Qed.
