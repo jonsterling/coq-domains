@@ -67,8 +67,7 @@ Qed.
 Lemma leq_to_lub {D : Dcpo.type} : ∀ x y : D, ∀ p : x ≤ y, y = dlub (leq_family x y) (leq_family_directed x y p).
 Proof.
   move=> x y xy.
-  apply: (lub_unique (leq_family x y)); last by apply: dlub_is_lub.
-  split; first by case.
+  apply/lub_unique/dlub_is_lub; split; first by case.
   by move=> z /(_ false).
 Qed.
 
@@ -103,9 +102,7 @@ Qed.
 Lemma is_continuous_cmp {D E F : Dcpo.type} (f : D → E) (g : E → F) : is_continuous f → is_continuous g → is_continuous (λ x, g (f x)).
 Proof.
   move=> fcont gcont; split.
-  - move=> //= i.
-    apply: continuous_to_monotone; first by auto.
-    apply: (lub_is_ub _ _ (fcont A h)).
+  - by move=> ?; apply/continuous_to_monotone/(lub_is_ub _ _ (fcont _ _)).
   - move=> z H.
     apply: lub_univ.
     + pose gcont' := relax_continuous gcont.
