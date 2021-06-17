@@ -127,6 +127,7 @@ Proof.
 Defined.
 
 Lemma seal_bot : is_bottom (@seal A ϕ ⊥).
+Proof.
   have: {h : T A ϕ → Rel (T A ϕ) | ∀ x, pi _ (h x) = (seal ⊥, x) }.
   - unshelve esplit.
     + apply: seal_bot_aux.
