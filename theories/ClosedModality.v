@@ -1,6 +1,6 @@
 (** EXPERIMENTAL. This file is a mess, don't look at it! LOL *)
 
-Require Import Preamble Preorder Poset Dcpo DcpoProduct OrderSpace.
+From Domains Require Import Preamble Preorder Poset Dcpo DcpoProduct OrderSpace.
 
 Axiom T : Dcpo.type → Prop → Dcpo.type.
 

@@ -1,4 +1,4 @@
-Require Export ssreflect Unicode.Utf8.
+Require Export ssreflect ssrfun Unicode.Utf8.
 From HB Require Export structures.
 Require Export Coq.Logic.Description Coq.Logic.PropExtensionality Coq.Logic.FunctionalExtensionality Program.Equality.
 
@@ -19,16 +19,16 @@ Module Im.
       { y : Y | ∃ x, f x = y }.
 
     Definition surj : X → T.
-    Proof. move=> x; exists (f x); by exists x. Defined.
+    Proof. by move=> x; exists (f x); exists x. Defined.
 
     Definition inj : T → Y.
-    Proof. apply: proj1_sig. Defined.
+    Proof. by apply: proj1_sig. Defined.
 
     Lemma inj_injective : ∀ x y, inj x = inj y → x = y.
-    Proof. move=> x y h; apply: eq_sig; apply: proof_irrelevance. Qed.
+    Proof. by move=> x y h; apply/eq_sig/proof_irrelevance. Qed.
 
     Lemma surj_surjective : ∀ i : T, ∃ x : X, surj x = i.
-    Proof. move=> [y [x h]]; exists x; apply: eq_sig; apply: proof_irrelevance. Qed.
+    Proof. by move=> [y [x h]]; exists x; apply/eq_sig/proof_irrelevance. Qed.
   End Im.
 End Im.
 
