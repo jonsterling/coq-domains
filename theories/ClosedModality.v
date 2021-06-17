@@ -135,9 +135,9 @@ Lemma seal_bot : is_bottom (@seal A ϕ ⊥).
       * rewrite /seal_bot_aux'.
         apply: (unseal_uniq (fun x => pi (T A ϕ) (seal_bot_aux x))).
         -- apply: is_continuous_cmp.
-           ** apply: unseal_cont.
-           ** admit.
-           (* product projections continuous. *)
+           ++ apply: unseal_cont.
+           ++ admit.
+              (* "pi" is continuous, from OrderSpace *)
         -- move=> ?; by rewrite /seal_bot_aux unseal_seal.
         -- move=> ?; by rewrite /seal_bot_aux unseal_pt.
       * rewrite /seal_bot_aux'; symmetry.

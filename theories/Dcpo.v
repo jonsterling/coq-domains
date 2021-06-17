@@ -53,10 +53,6 @@ Definition is_continuous {D E : Dcpo.type} (f : D → E) :=
   ∀ (A : Family D) (h : is_directed A),
     is_lub (push_fam f A) (f (dlub A h)).
 
-Definition is_monotone {D E : Poset.type} (f : D → E) :=
-  ∀ x y, x ≤ y → f x ≤ f y.
-
-
 
 Definition leq_family {D : Dcpo.type} (x y : D) : Family D.
   by exists bool; case; [exact: x | exact: y].
