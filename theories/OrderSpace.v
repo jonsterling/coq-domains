@@ -3,7 +3,7 @@ Require Import Preamble Preorder Poset Dcpo.
 (** It is sometimes useful to be able to treat the underlying order relation of a dcpo as a dcpo. *)
 
 Section OrderSpace.
-  Context {D : Dcpo.type}.
+  Context (D : Dcpo.type).
   Definition Rel := { p : D * D | p.1 ≤ p.2}.
 
   Definition pi (p : Rel) : D * D := proj1_sig p.
