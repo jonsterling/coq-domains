@@ -1,4 +1,4 @@
-(** EXPERIMENTAL *)
+(** EXPERIMENTAL. This file is a mess, don't look at it! LOL *)
 
 Require Import Preamble Preorder Poset Dcpo DcpoProduct OrderSpace.
 
