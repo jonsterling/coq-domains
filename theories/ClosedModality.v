@@ -23,10 +23,6 @@ Section Modality.
   Axiom unseal_uniq : ∀ h, is_continuous h → (∀ x, h (seal x) = f x) → (∀ x, h (pt x) = g x) → h = unseal f g coh fcont.
 End Modality.
 
-Check unseal.
-
-Check unseal.
-
 Context (A : Dcppo.type) (ϕ : Prop).
 
 Lemma seal_bot_aux_sl : A → Rel (T A ϕ).
