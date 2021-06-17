@@ -48,12 +48,10 @@ Section PathFromLt.
         * move=> [i u].
           apply: ltT; last by apply: zub.
           apply: ltT'.
-          -- apply: lub_is_ub; first by apply: dlub_is_lub.
-             by left.
+          -- by apply: lub_is_ub; [apply: dlub_is_lub | left].
           -- by [].
-        * apply: (lub_univ A); first by apply: dlub_is_lub.
-          -- by apply/lub_is_ub/Σ_exists_is_lub.
-          -- by [].
+        * apply: (lub_univ A); auto.
+          by apply/lub_is_ub/Σ_exists_is_lub.
       + move=> _.
         case: dirA => [[i _] h].
         apply: ltT; last by apply: zub.

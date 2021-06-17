@@ -127,6 +127,7 @@ Proof.
 Defined.
 
 Lemma seal_bot : is_bottom (@seal A ϕ ⊥).
+Proof.
   have: {h : T A ϕ → Rel (T A ϕ) | ∀ x, pi _ (h x) = (seal ⊥, x) }.
   - unshelve esplit.
     + apply: seal_bot_aux.
@@ -134,13 +135,15 @@ Lemma seal_bot : is_bottom (@seal A ϕ ⊥).
       replace (seal ⊥, x) with (seal_bot_aux' x).
       * rewrite /seal_bot_aux'.
         apply: (unseal_uniq (fun x => pi (T A ϕ) (seal_bot_aux x))).
-        -- admit.
-           (* continuity closed under composition, product projections continuous. *)
+        -- apply: is_continuous_cmp.
+           ++ apply: unseal_cont.
+           ++ admit.
+              (* "pi" is continuous, from OrderSpace *)
         -- move=> ?; by rewrite /seal_bot_aux unseal_seal.
         -- move=> ?; by rewrite /seal_bot_aux unseal_pt.
       * rewrite /seal_bot_aux'; symmetry.
         apply: (unseal_uniq (λ x, (seal ⊥, x))).
-        -- admit. (* pairs are continuous *)
+        -- apply: pair_left_continous.
         -- move=> a.
            by rewrite /seal_bot_aux_sl' /seal_bot_aux_sl.
         -- move=> z.
