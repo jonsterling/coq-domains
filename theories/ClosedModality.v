@@ -150,5 +150,4 @@ Lemma seal_bot : is_bottom (@seal A ϕ ⊥).
     have h'' := (rel _ (h x)).
     rewrite /pi1 /pi2 in h''.
     by rewrite h' in h''.
-(* This should follow from the universal property, but I need to define D^2 as a dcpo. *)
 Admitted.
