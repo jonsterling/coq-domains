@@ -118,6 +118,7 @@ Proof.
   - apply: seal_bot_aux_sl'_cont.
 Defined.
 
+(** The following lemma can't be proved in this style because the projection map [pi] is not continuous. *)
 Lemma seal_bot : is_bottom (@seal A ϕ ⊥).
 Proof.
   have: {h : T A ϕ → Rel (T A ϕ) | ∀ x, pi _ (h x) = (seal ⊥, x) }.

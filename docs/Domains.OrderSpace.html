@@ -28,7 +28,44 @@
 <h1 class="libtitle">Domains.OrderSpace</h1>
 
 <div class="code">
-<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="Domains.Preamble.html#"><span class="id" title="library">Preamble</span></a> <a class="idref" href="Domains.Preorder.html#"><span class="id" title="library">Preorder</span></a> <a class="idref" href="Domains.Poset.html#"><span class="id" title="library">Poset</span></a> <a class="idref" href="Domains.Dcpo.html#"><span class="id" title="library">Dcpo</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="Domains.Preamble.html#"><span class="id" title="library">Preamble</span></a> <a class="idref" href="Domains.Preorder.html#"><span class="id" title="library">Preorder</span></a> <a class="idref" href="Domains.Poset.html#"><span class="id" title="library">Poset</span></a> <a class="idref" href="Domains.Dcpo.html#"><span class="id" title="library">Dcpo</span></a> <a class="idref" href="Domains.DcpoProduct.html#"><span class="id" title="library">DcpoProduct</span></a>.<br/>
+
+<br/>
+<span class="comment">(*<br/>
+<span class="comment">(**&nbsp;TODO:&nbsp;move&nbsp;this.&nbsp;*)</span><br/>
+Section&nbsp;SubsetPoset.<br/>
+&nbsp;&nbsp;Context&nbsp;(D&nbsp;:&nbsp;Poset.type)&nbsp;(P&nbsp;:&nbsp;D&nbsp;→&nbsp;Prop).<br/>
+&nbsp;&nbsp;Definition&nbsp;sub&nbsp;:=&nbsp;{&nbsp;x&nbsp;:&nbsp;D&nbsp;|&nbsp;P&nbsp;x&nbsp;}.<br/>
+<br/>
+&nbsp;&nbsp;Definition&nbsp;pi&nbsp;(x&nbsp;:&nbsp;sub)&nbsp;:&nbsp;D&nbsp;:=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;proj1_sig&nbsp;x.<br/>
+<br/>
+&nbsp;&nbsp;Definition&nbsp;sub_lt&nbsp;(x&nbsp;y&nbsp;:&nbsp;sub)&nbsp;:&nbsp;Prop&nbsp;:=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;pi&nbsp;x&nbsp;≤&nbsp;pi&nbsp;y.<br/>
+<br/>
+&nbsp;&nbsp;Lemma&nbsp;sub_ltR&nbsp;:&nbsp;∀&nbsp;x,&nbsp;sub_lt&nbsp;x&nbsp;x.<br/>
+&nbsp;&nbsp;Proof.&nbsp;by&nbsp;move=&gt;?;&nbsp;apply:&nbsp;ltR.&nbsp;Qed.<br/>
+<br/>
+&nbsp;&nbsp;Lemma&nbsp;sub_ltT&nbsp;:&nbsp;∀&nbsp;x&nbsp;y&nbsp;z,&nbsp;sub_lt&nbsp;x&nbsp;y&nbsp;→&nbsp;sub_lt&nbsp;y&nbsp;z&nbsp;→&nbsp;sub_lt&nbsp;x&nbsp;z.<br/>
+&nbsp;&nbsp;Proof.&nbsp;by&nbsp;move=&gt;???;&nbsp;apply:&nbsp;ltT.&nbsp;Qed.<br/>
+<br/>
+&nbsp;&nbsp;HB.instance&nbsp;Definition&nbsp;sub_preorder_axioms&nbsp;:=&nbsp;PreorderOfType.Build&nbsp;sub&nbsp;sub_lt&nbsp;sub_ltR&nbsp;sub_ltT.<br/>
+<br/>
+&nbsp;&nbsp;Lemma&nbsp;sub_ltE&nbsp;:&nbsp;∀&nbsp;x&nbsp;y&nbsp;:&nbsp;sub,&nbsp;x&nbsp;≤&nbsp;y&nbsp;→&nbsp;y&nbsp;≤&nbsp;x&nbsp;→&nbsp;x&nbsp;=&nbsp;y.<br/>
+&nbsp;&nbsp;Proof.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;move=&gt;&nbsp;????.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;apply:&nbsp;eq_sig;&nbsp;auto.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;by&nbsp;apply:&nbsp;ltE.<br/>
+&nbsp;&nbsp;Qed.<br/>
+<br/>
+&nbsp;&nbsp;HB.instance&nbsp;Definition&nbsp;sub_poset_axioms&nbsp;:=&nbsp;PosetOfPreorder.Build&nbsp;sub&nbsp;sub_ltE.<br/>
+<br/>
+&nbsp;&nbsp;Lemma&nbsp;pi_mono&nbsp;:&nbsp;is_monotone&nbsp;pi.<br/>
+&nbsp;&nbsp;Proof.&nbsp;done.&nbsp;Qed.<br/>
+<br/>
+&nbsp;&nbsp;<span class="comment">(**&nbsp;It&nbsp;looks&nbsp;like&nbsp;the&nbsp;projection&nbsp;is&nbsp;not&nbsp;continuous.&nbsp;*)</span><br/>
+End&nbsp;SubsetPoset.<br/>
+*)</span><br/>
 
 <br/>
 </div>
@@ -123,6 +160,12 @@ It is sometimes useful to be able to treat the underlying order relation of a dc
 &nbsp;&nbsp;<span class="id" title="var">HB.instance</span> <span class="id" title="keyword">Definition</span> <span class="id" title="var">Rel_dcpo_axioms</span> := <a class="idref" href="Domains.Dcpo.html#DcpoOfPoset.Build"><span class="id" title="abbreviation">DcpoOfPoset.Build</span></a> <a class="idref" href="Domains.OrderSpace.html#Rel"><span class="id" title="definition">Rel</span></a> <a class="idref" href="Domains.OrderSpace.html#Rel_ltHasDLubs"><span class="id" title="lemma">Rel_ltHasDLubs</span></a>.<br/>
 
 <br/>
+</div>
+
+<div class="doc">
+The projection is not continuous... 
+</div>
+<div class="code">
 <span class="id" title="keyword">End</span> <a class="idref" href="Domains.OrderSpace.html#OrderSpace"><span class="id" title="section">OrderSpace</span></a>.<br/>
 </div>
 </div>

@@ -1,4 +1,40 @@
-Require Import Preamble Preorder Poset Dcpo.
+Require Import Preamble Preorder Poset Dcpo DcpoProduct.
+
+(*
+(** TODO: move this. *)
+Section SubsetPoset.
+  Context (D : Poset.type) (P : D → Prop).
+  Definition sub := { x : D | P x }.
+
+  Definition pi (x : sub) : D :=
+    proj1_sig x.
+
+  Definition sub_lt (x y : sub) : Prop :=
+    pi x ≤ pi y.
+
+  Lemma sub_ltR : ∀ x, sub_lt x x.
+  Proof. by move=>?; apply: ltR. Qed.
+
+  Lemma sub_ltT : ∀ x y z, sub_lt x y → sub_lt y z → sub_lt x z.
+  Proof. by move=>???; apply: ltT. Qed.
+
+  HB.instance Definition sub_preorder_axioms := PreorderOfType.Build sub sub_lt sub_ltR sub_ltT.
+
+  Lemma sub_ltE : ∀ x y : sub, x ≤ y → y ≤ x → x = y.
+  Proof.
+    move=> ????.
+    apply: eq_sig; auto.
+    by apply: ltE.
+  Qed.
+
+  HB.instance Definition sub_poset_axioms := PosetOfPreorder.Build sub sub_ltE.
+
+  Lemma pi_mono : is_monotone pi.
+  Proof. done. Qed.
+
+  (** It looks like the projection is not continuous. *)
+End SubsetPoset.
+*)
 
 (** It is sometimes useful to be able to treat the underlying order relation of a dcpo as a dcpo. *)
 
@@ -73,4 +109,5 @@ Section OrderSpace.
 
   HB.instance Definition Rel_dcpo_axioms := DcpoOfPoset.Build Rel Rel_ltHasDLubs.
 
+  (** The projection is not continuous... *)
 End OrderSpace.
