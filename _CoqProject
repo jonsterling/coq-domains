@@ -7,7 +7,6 @@ theories/Poset.v
 theories/Dcpo.v
 theories/DcpoExponential.v
 theories/DcpoProduct.v
-theories/OrderSpace.v
 theories/Sierpinski.v
 theories/Path.v
 theories/Lift.v
