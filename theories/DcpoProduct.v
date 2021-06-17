@@ -57,4 +57,40 @@ Section Product.
   End DLub.
 
   HB.instance Definition prod_dcpo_axioms := DcpoOfPoset.Build (prod D E) prod_ltHasDLubs.
+
+  Lemma fst_continous : is_continuous fst.
+  Proof.
+    move=> A dirA.
+    split.
+    - move=> //= i.
+      have: (A i ≤ dlub A dirA).
+      + apply: dlub_is_ub.
+      + by case.
+    - move=> //= x xub.
+      case: (dlub_least A dirA (x, (dlub A dirA).2)).
+      + move=> //= i; split; cbn.
+        * apply: xub.
+        * have: (A i ≤ dlub A dirA).
+          -- by apply: dlub_is_ub.
+          -- by case.
+      + done.
+  Qed.
+
+  Lemma snd_continous : is_continuous snd.
+  Proof.
+    move=> A dirA.
+    split.
+    - move=> //= i.
+      have: (A i ≤ dlub A dirA).
+      + apply: dlub_is_ub.
+      + by case.
+    - move=> //= x xub.
+      case: (dlub_least A dirA ((dlub A dirA).1, x)).
+      + move=> //= i; split; cbn.
+        * have: (A i ≤ dlub A dirA).
+          -- by apply: dlub_is_ub.
+          -- by case.
+        * apply: xub.
+      + done.
+  Qed.
 End Product.
