@@ -53,7 +53,6 @@ Definition is_continuous {D E : Dcpo.type} (f : D → E) :=
   ∀ (A : Family D) (h : is_directed A),
     is_lub (push_fam f A) (f (dlub A h)).
 
-
 Definition leq_family {D : Dcpo.type} (x y : D) : Family D.
   by exists bool; case; [exact: x | exact: y].
 Defined.
@@ -99,14 +98,13 @@ Proof.
   - apply: lub_unique; auto.
 Qed.
 
-Lemma is_continuous_cmp {D E F : Dcpo.type} (f : D → E) (g : E → F) : is_continuous f → is_continuous g → is_continuous (λ x, g (f x)).
+Lemma is_continuous_cmp {D E F : Dcpo.type} (f : D → E) (g : E → F) : is_continuous f → is_continuous g → is_continuous (g \o f).
 Proof.
   move=> fcont gcont; split.
-  - by move=> ?; apply/continuous_to_monotone/(lub_is_ub _ _ (fcont _ _)).
+  - by move=> ? /=; apply/continuous_to_monotone/(lub_is_ub _ _ (fcont _ _)).
   - move=> z H.
     apply: lub_univ.
-    + pose gcont' := relax_continuous gcont.
-      apply: gcont'; last by auto.
+    + apply: (relax_continuous gcont); last by auto.
       apply: monotone_preserves_directed; last by auto.
       by apply: continuous_to_monotone.
     + done.
