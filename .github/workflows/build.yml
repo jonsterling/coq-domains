@@ -1,8 +1,14 @@
+name: build
+
+# Controls when the action will run.
 on:
+  # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches:
-      - master
-      - doc*
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
 strategy:
   matrix:
     coq_version:
@@ -20,6 +26,10 @@ jobs:
           opam_file: 'coq-domains.opam'
           coq_version: ${{ matrix.coq_version }}
           ocaml_version: ${{ matrix.ocaml_version }}
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
 
       - uses: peaceiris/actions-gh-pages@v3
         with:
