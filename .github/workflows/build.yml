@@ -28,6 +28,9 @@ jobs:
           coq_version: ${{ matrix.coq_version }}
           ocaml_version: ${{ matrix.ocaml_version }}
 
+
+      - run: opam pin . -y
+      - run: make
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
