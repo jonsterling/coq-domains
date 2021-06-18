@@ -35,7 +35,7 @@ Section PathFromLt.
       + move=>s; apply: ltT'.
         * by apply: dlub_is_ub; left; apply: (Σ_lub_intro A _ _ _ s).
         * by [].
-      + move=> _; apply: ltT'.
+      + move=> []; apply: ltT'.
         * by apply: dlub_is_ub; right.
         * by [].
     - move=> z zub; apply: (lub_univ _)=>//; case=>/=.
