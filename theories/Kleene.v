@@ -1,6 +1,6 @@
 From Coq Require Import ssrbool.
 From mathcomp Require Import ssrnat.
-From Domains Require Import Preamble Preorder Poset Dcpo.
+From Domains Require Import Preamble Preorder Poset Dcpo DcpoExponential.
 
 (* Kleene fixed-point theorem *)
 
@@ -34,20 +34,37 @@ Qed.
 Definition is_least_fixpoint {D : Poset.type} (f : D -> D) (x : D) :=
   f x = x ∧ ∀ y, f y = y -> x ≤ y.
 
-Theorem kleene_lfp {D : Dcppo.type} (f : D -> D) :
-  is_continuous f ->
-  ∃ x, is_lub (pow_family f) x ∧ is_least_fixpoint f x.
+Theorem kleene_lfp {D : Dcppo.type} (f : map D D) :
+  ∃ x, is_lub (pow_family (ap f)) x ∧ is_least_fixpoint (ap f) x.
 Proof.
-move/[dup]/continuous_to_monotone/[dup]/pow_chain_directed=>HD HM H.
+case: f=>f /[dup]/continuous_to_monotone/[dup]/pow_chain_directed HD HM H /=.
 exists (dlub _ HD); split; first by apply: dlub_is_lub.
 split.
 - case: (H _ HD)=>H1 H2.
   apply: (lub_unique (pow_family _)); last by apply: dlub_is_lub.
-  split.
-  + by case=>/=; [apply: bottom_is_bottom | apply: H1].
-  + move=>? H3; apply: H2=>i.
-    by apply: (H3 (S i)).
+  split=>/=.
+  + case=>/=; [apply: bottom_is_bottom | apply: H1].
+  + move=>? H3; apply: H2; move=>/=i.
+    by exact: (H3 (S i)).
 - move=>? H1; apply: dlub_least=>x /=.
   elim: x=>/=; first by apply: bottom_is_bottom.
   by move=>??; rewrite -H1; apply: HM.
+Qed.
+
+Lemma map_pow_monotone {D : Dcppo.type} n :
+  is_monotone (λ f : map D D, pow (ap f) n).
+Proof.
+elim: n=>[|n IH] //=.
+move=>/= ?? l.
+apply: ltT; first by apply: l.
+by apply: continuous_to_monotone; [apply: ap_cont | apply: IH].
+Qed.
+
+Lemma map_pow_family_directed {D : Dcppo.type} {A : Family (map D D)}
+  (H : is_directed A) (n : nat):
+  is_directed (push_fam (λ f : map D D, pow (ap f) n) A).
+Proof.
+split; first by exact: (nonempty _ H).
+move=>i j; case: (predirected _ H i j)=>/= x [??].
+by exists x; split; apply: map_pow_monotone.
 Qed.
