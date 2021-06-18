@@ -97,7 +97,6 @@ Section DirectedFamilies.
      predirected : is_predirected}.
 End DirectedFamilies.
 
-
 Section Lub.
   Context {A : Poset.type} (F : Family A).
 
@@ -111,6 +110,6 @@ Section Lub.
   Lemma lub_unique : ∀ x y : A, is_lub x → is_lub y → x = y.
   Proof. by move=> ?? [? Hx] [? Hy]; apply: ltE; [apply: Hx| apply: Hy]. Qed.
 
-  Lemma above_lub : ∀ x y : A, is_lub x → (∀ z, F z ≤ y) → x ≤ y.
+  Lemma above_lub : ∀ x y : A, is_lub x → is_ub y → x ≤ y.
   Proof. by move=> ?? [?]; apply. Qed.
 End Lub.

@@ -121,5 +121,5 @@ Section Lift.
     Qed.
   End Lub.
 
-  HB.instance Definition L_dpco_axioms := DcpoOfPoset.Build (L A) L_ltHasDLub.
+  HB.instance Definition L_dcpo_axioms := DcpoOfPoset.Build (L A) L_ltHasDLub.
 End Lift.
