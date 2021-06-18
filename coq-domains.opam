@@ -1,0 +1,29 @@
+opam-version: "2.0"
+synopsis: "A Coq library for constructive domain theory" # One-line description
+description: """
+  A Coq library for constructive domain theory
+""" # Longer description, can span several lines
+
+homepage: "https://github.com/jonsterling/coq-domains"
+dev-repo: "git+https://github.com/jonsterling/coq-domains.git"
+bug-reports: "https://github.com/jonsterling/coq-domains/issues"
+doc: "https://jonsterling.github.io/coq-domains/"
+maintainer: "your@email.address"
+authors: [
+  "Jonathan Sterling"
+  "Alex Gryzlov"
+]
+
+# license: "MIT" # what should the license be ???
+
+depends: [
+  "coq" {>= "8.13.2" & < "8.14~"}
+]
+
+build: [
+  [make]
+]
+install: [
+  [make "install"]
+]
+
