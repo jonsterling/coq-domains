@@ -17,6 +17,7 @@ Proof. by move=> *; apply: propext. Qed.
 HB.instance Definition Σ_poset_axioms := PosetOfPreorder.Build Σ Σ_ltE.
 
 Lemma Σ_exists_is_lub : ∀ (A : Family Σ), is_lub A (∃ x, A x).
+Proof.
   move=> A; split=>/=.
   - by move=>i; move=>?; exists i.
   - move=>? zub; move=> [x ?].
