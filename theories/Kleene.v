@@ -2,6 +2,8 @@ From Coq Require Import ssrbool.
 From mathcomp Require Import ssrnat.
 From Domains Require Import Preamble Preorder Poset Dcpo DcpoExponential.
 
+Set Bullet Behavior "Strict Subproofs".
+
 (* Kleene fixed-point theorem *)
 
 Fixpoint pow {D : PointedPoset.type} (f : D -> D) n :=
