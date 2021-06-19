@@ -8,9 +8,7 @@ Section Map.
   Definition ap_cont (f : map) : is_continuous (ap f) := proj2_sig f.
 
   Lemma map_ext : ∀ f g, ap f = ap g → f = g.
-  Proof.
-    by rewrite /map => f g fg; apply: eq_sig.
-  Qed.
+  Proof. by rewrite /map => f g fg; apply: eq_sig. Qed.
 
   Definition map_lt (f g : map) : Prop :=
     ∀ x, ap f x ≤ ap g x.

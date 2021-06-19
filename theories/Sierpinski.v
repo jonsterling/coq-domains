@@ -49,6 +49,7 @@ Proof.
 Qed.
 
 Lemma Σ_bot_rw : (⊥ : Σ) = False.
+Proof.
   apply: bottom_is_unique.
   - by apply: bottom_is_bottom.
   - by move=>?.
