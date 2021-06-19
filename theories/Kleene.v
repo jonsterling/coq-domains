@@ -16,21 +16,21 @@ Lemma pow_chain {D : PointedPoset.type} (f : D -> D) n m :
   is_monotone f ->
   pow f n ≤ pow f m ∨ pow f m ≤ pow f n.
 Proof.
-move=>Hm; case: (leqP n m)=>H.
-- left; elim: n m H=>[|? IH] m H /=; first by apply: bottom_is_bottom.
-  by case: m H=>// ?? /=; apply/Hm/IH.
-- right; elim: m n H=>[|? IH] n H /=; first by apply: bottom_is_bottom.
-  by case: n H=>// ?? /=; apply/Hm/IH.
+  move=>Hm; case: (leqP n m)=>H.
+  - left; elim: n m H=>[|? IH] m H /=; first by apply: bottom_is_bottom.
+    by case: m H=>// ?? /=; apply/Hm/IH.
+  - right; elim: m n H=>[|? IH] n H /=; first by apply: bottom_is_bottom.
+    by case: n H=>// ?? /=; apply/Hm/IH.
 Qed.
 
 Lemma pow_chain_directed {D : PointedPoset.type} (f : D -> D) :
   is_monotone f ->
   is_directed (pow_family f).
 Proof.
-move=>H; split=>/=.
-- by exists 0.
-- move=>/= n m.
-  by case: (pow_chain f n m H)=>?; [exists m | exists n].
+  move=>H; split=>/=.
+  - by exists 0.
+  - move=>/= n m.
+    by case: (pow_chain f n m H)=>?; [exists m | exists n].
 Qed.
 
 Definition is_least_fixpoint {D : Poset.type} (f : D -> D) (x : D) :=
@@ -39,34 +39,34 @@ Definition is_least_fixpoint {D : Poset.type} (f : D -> D) (x : D) :=
 Theorem kleene_lfp {D : Dcppo.type} (f : map D D) :
   ∃ x, is_lub (pow_family (ap f)) x ∧ is_least_fixpoint (ap f) x.
 Proof.
-case: f=>f /[dup]/continuous_to_monotone/[dup]/pow_chain_directed HD HM H /=.
-exists (dlub _ HD); split; first by apply: dlub_is_lub.
-split.
-- case: (H _ HD)=>H1 H2.
-  apply: (lub_unique (pow_family _)); last by apply: dlub_is_lub.
-  split=>/=.
-  + case=>/=; [apply: bottom_is_bottom | apply: H1].
-  + move=>? H3; apply: H2; move=>/=i.
-    by exact: (H3 (S i)).
-- move=>? H1; apply: dlub_least=>x /=.
-  elim: x=>/=; first by apply: bottom_is_bottom.
-  by move=>??; rewrite -H1; apply: HM.
+  case: f=>f /[dup]/continuous_to_monotone/[dup]/pow_chain_directed HD HM H /=.
+  exists (dlub _ HD); split; first by apply: dlub_is_lub.
+  split.
+  - case: (H _ HD)=>H1 H2.
+    apply: (lub_unique (pow_family _)); last by apply: dlub_is_lub.
+    split=>/=.
+    + case=>/=; [apply: bottom_is_bottom | apply: H1].
+    + move=>? H3; apply: H2; move=>/=i.
+      by exact: (H3 (S i)).
+  - move=>? H1; apply: dlub_least=>x /=.
+    elim: x=>/=; first by apply: bottom_is_bottom.
+    by move=>??; rewrite -H1; apply: HM.
 Qed.
 
 Lemma map_pow_monotone {D : Dcppo.type} n :
   is_monotone (λ f : map D D, pow (ap f) n).
 Proof.
-elim: n=>[|n IH] //=.
-move=>/= ?? l.
-apply: ltT; first by apply: l.
-by apply: continuous_to_monotone; [apply: ap_cont | apply: IH].
+  elim: n=>[|n IH] //=.
+  move=>/= ?? l.
+  apply: ltT; first by apply: l.
+  by apply: continuous_to_monotone; [apply: ap_cont | apply: IH].
 Qed.
 
 Lemma map_pow_family_directed {D : Dcppo.type} {A : Family (map D D)}
   (H : is_directed A) (n : nat):
   is_directed (push_fam (λ f : map D D, pow (ap f) n) A).
 Proof.
-split; first by exact: (nonempty _ H).
-move=>i j; case: (predirected _ H i j)=>/= x [??].
-by exists x; split; apply: map_pow_monotone.
+  split; first by exact: (nonempty _ H).
+  move=>i j; case: (predirected _ H i j)=>/= x [??].
+  by exists x; split; apply: map_pow_monotone.
 Qed.
