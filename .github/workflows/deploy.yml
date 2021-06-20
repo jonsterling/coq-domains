@@ -1,7 +1,13 @@
-name: build
+name: deploy
 
 # Controls when the action will run.
-on: [push,pull_request]
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 
 jobs:
@@ -29,3 +35,12 @@ jobs:
             startGroup "Build project"
               make
             endGroup
+
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          force_orphan: false
+          keep_files: true
+          publish_dir: ./html
+
+
