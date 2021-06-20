@@ -89,37 +89,167 @@ Section Lift.
       by move=> a b; rewrite (_ : a = b).
     Defined.
 
-    Definition candidate_dlub_compute : ∀ Q, ∀ i x, F i x = candidate_dlub Q.
+    Definition candidate_dlub_compute : ∀ Q i x, F i x = candidate_dlub Q.
     Proof. by move=> Q i x; apply: (iota_prop (λ a, ∀ i x, F i x = a)). Qed.
 
     Opaque candidate_dlub.
 
-    Lemma L_ltHasDLub : ∃ m : L A, is_lub F m.
+    Definition L_dlub : L A.
     Proof.
       unshelve esplit.
-      - unshelve esplit.
-        + by apply: dlub directed_defd_fam.
-        + by apply: candidate_dlub.
-      - split.
-        + move=> i.
-          apply: L_make_lt =>/= x.
-          unshelve esplit.
-          * apply: Σ_lub_intro=>//.
-            by exact: x.
-          * by rewrite -(candidate_dlub_compute _ i x).
-        + move=> m H; move=> //= x.
-          apply: L_ext=>//.
-          * apply: above_lub=>//=.
-            move=> i; move=> z.
-            by rewrite -(H i z).
-          * move=> /= H' H''.
-            rewrite (_ : H'' = x) //; move: H''.
-            apply: Σ_lub_elim=>//= i z.
-            rewrite -(candidate_dlub_compute x i).
-            generalize z.
-            by rewrite (H i z)=> ?; f_equal.
+      - by apply: dlub directed_defd_fam.
+      - by apply: candidate_dlub.
+    Defined.
+
+    Lemma L_dlub_is_lub : is_lub F L_dlub.
+    Proof.
+      split.
+      - move=> i.
+        apply: L_make_lt =>/= x.
+        unshelve esplit.
+        + apply: Σ_lub_intro=>//.
+          by exact: x.
+        + by rewrite -(candidate_dlub_compute _ i x).
+      - move=> m H; move=> //= x.
+        apply: L_ext=>//.
+        + apply: above_lub=>//=.
+          move=> i; move=> z.
+          by rewrite -(H i z).
+        + move=> /= H' H''.
+          rewrite (_ : H'' = x) //; move: H''.
+          apply: Σ_lub_elim=>//= i z.
+          rewrite -(candidate_dlub_compute x i).
+          generalize z.
+          by rewrite (H i z)=> ?; f_equal.
     Qed.
+
+    Lemma L_ltHasDLub : ∃ m : L A, is_lub F m.
+    Proof. exists L_dlub; by apply: L_dlub_is_lub. Qed.
+
+    Lemma L_dlub_rw : ∀ m : L A, is_lub F m → m = L_dlub.
+    Proof. move=> m ?; by apply/lub_unique/L_dlub_is_lub. Qed.
   End Lub.
 
   HB.instance Definition L_dcpo_axioms := DcpoOfPoset.Build (L A) L_ltHasDLub.
 End Lift.
+
+Section Functor.
+
+  Context {A B : Type} (f : A → B).
+
+  Definition fmap : L A → L B.
+  Proof. by move=> x; exists (defd x) => z; apply/f/x/z. Defined.
+
+  Lemma fmap_cont : is_continuous fmap.
+  Proof.
+    move=> F dirF //= x xlub; split.
+    - move=> //= i; move=> z.
+      rewrite /fmap.
+      rewrite (_ : F i = x); last by [].
+      by apply: lub_is_ub xlub i z.
+
+    - move=> //= y yub.
+      rewrite (L_dlub_rw _ _ _ x xlub).
+      apply: Σ_lub_elim; first by auto.
+      move=> //= i di.
+      rewrite -(yub i di) => //=.
+      f_equal.
+      apply: L_ext.
+      + apply: above_lub; eauto.
+        by move=> //= ?.
+      + move=> ?.
+        apply: Σ_lub_intro; eauto.
+        by exact: di.
+      + move=> //= Q/[dup].
+        apply: Σ_lub_elim; first by auto.
+        move=> //= j dj z.
+        by rewrite candidate_dlub_compute.
+  Qed.
+End Functor.
+
+
+Section Alg.
+  Context (D : Dcppo.type).
+
+  Definition alg_fam (x : L D) : Family D.
+  Proof.
+    exists (sum (defd x) True); case.
+    + apply: x.
+    + move=> _; exact: ⊥.
+  Defined.
+
+  Lemma alg_fam_dir (x : L D) : is_directed (alg_fam x).
+  Proof.
+    split.
+    + by unshelve esplit; first by right.
+    + case.
+      - move=> z; case.
+        * move=> z'.
+          unshelve esplit; first by left.
+          cbn; split; last by [].
+          by replace z' with z.
+        * move=> [].
+          unshelve esplit; first by left.
+          cbn; split; first by [].
+          apply: bottom_is_bottom.
+      - move=> []; case.
+        * move=> z.
+          unshelve esplit; first by left.
+          cbn; split; last by [].
+          apply: bottom_is_bottom.
+        * move=> [].
+          unshelve esplit; first by right.
+          by cbn; split.
+  Qed.
+
+  Definition alg : L D → D.
+  Proof. by move=> x; apply/dlub/alg_fam_dir/x. Defined.
+
+  Lemma alg_cont : is_continuous alg.
+  Proof.
+    move=> F dirF //= x xlub.
+    rewrite /alg.
+    split.
+    - move=> //= i.
+      apply: above_lub; first by auto.
+      case.
+      + move=> di.
+        rewrite -(lub_is_ub _ _ xlub i di).
+        by apply: lub_is_ub.
+      + move=> [].
+        apply: bottom_is_bottom.
+    - move=> z zub; cbn.
+      rewrite (L_dlub_rw _ _ _ x xlub).
+      apply: above_lub; first by auto.
+      case.
+      + move/[dup]; apply: Σ_lub_elim; auto.
+        move=>//= i di u.
+        rewrite -(candidate_dlub_compute _ F dirF u i di).
+        apply: ltT'.
+        * apply: zub i.
+        * cbn.
+          apply: ltT'.
+          -- apply: lub_is_ub; auto.
+             by left.
+          -- auto.
+      + move=> [].
+        apply: bottom_is_bottom.
+  Qed.
+End Alg.
+
+
+Section UniversalProperty.
+
+  Context (A : Type) (C : Dcppo.type) (f : A → C).
+
+  Definition univ_map : L A → C := alg _ \o fmap f.
+
+  Lemma univ_map_cont : is_continuous univ_map.
+  Proof.
+    apply: cmp_cont.
+    - apply/cont_mono/fmap_cont.
+    - apply: fmap_cont.
+    - apply: alg_cont.
+  Qed.
+
+End UniversalProperty.
