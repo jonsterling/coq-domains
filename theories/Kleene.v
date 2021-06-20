@@ -39,10 +39,11 @@ Definition is_least_fixpoint {D : Poset.type} (f : D -> D) (x : D) :=
 Theorem kleene_lfp {D : Dcppo.type} (f : map D D) :
   ∃ x, is_lub (pow_family (ap f)) x ∧ is_least_fixpoint (ap f) x.
 Proof.
-  case: f=>f /[dup]/continuous_to_monotone/[dup]/pow_chain_directed HD HM H /=.
+  case: f=>f /[dup]/cont_mono/[dup]/pow_chain_directed HD HM H /=.
   exists (dlub _ HD); split; first by apply: dlub_is_lub.
   split.
-  - case: (H _ HD)=>H1 H2.
+  - case: (H _ HD (dlub (pow_family f) HD)); first by auto.
+    move=> H1 H2.
     apply: (lub_unique (pow_family _)); last by apply: dlub_is_lub.
     split=>/=.
     + case=>/=; [apply: bottom_is_bottom | apply: H1].
@@ -59,7 +60,7 @@ Proof.
   elim: n=>[|n IH] //=.
   move=>/= ?? l.
   apply: ltT; first by apply: l.
-  by apply: continuous_to_monotone; [apply: ap_cont | apply: IH].
+  by apply: cont_mono; [apply: ap_cont | apply: IH].
 Qed.
 
 Lemma map_pow_family_directed {D : Dcppo.type} {A : Family (map D D)}

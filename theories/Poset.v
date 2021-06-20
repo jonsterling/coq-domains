@@ -113,3 +113,36 @@ Section Lub.
   Lemma above_lub : ∀ x y : A, is_lub x → is_ub y → x ≤ y.
   Proof. by move=> ?? [?]; apply. Qed.
 End Lub.
+
+
+Definition push_fam {D E : Poset.type} (f : D → E) (F : Family D) : Family E.
+Proof.
+  exists (fam_ix F).
+  by move=>?; apply/f/F.
+Defined.
+
+
+Definition is_continuous {D E : Poset.type} (f : D → E) :=
+  ∀ (A : Family D) (h : is_directed A) x,
+    is_lub A x →
+    is_lub (push_fam f A) (f x).
+
+
+Lemma mono_preserves_dir {D E : Poset.type} {A : Family D} {f : D → E} : is_monotone f → is_directed A → is_directed (push_fam f A).
+Proof.
+  move=> mono dirA.
+  split.
+  + rewrite /is_nonempty /push_fam //=.
+    apply: nonempty dirA.
+  + move=> //= u v.
+    case: (predirected A dirA u v) => k [uk vk].
+    by exists k; split; apply: mono.
+Qed.
+
+Lemma cmp_cont {D E F : Poset.type} (f : D → E) (g : E → F) : is_monotone f → is_continuous f → is_continuous g → is_continuous (g \o f).
+Proof.
+  move=> fmono fcont gcont A dirA x xlub.
+  have fxlub: (is_lub (push_fam f A) (f x)); first by apply: fcont.
+  apply: (gcont (push_fam f A) _ (f x)); last by [].
+  by apply: mono_preserves_dir.
+Qed.
