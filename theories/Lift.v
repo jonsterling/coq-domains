@@ -130,8 +130,6 @@ Section Lift.
     Proof. move=> m ?; by apply/lub_unique/L_dlub_is_lub. Qed.
   End Lub.
 
-  (* TODO: need to export more useful rewrite lemmas from here. Too much of what follows is depending on the concrete computation. *)
-
   HB.instance Definition L_dcpo_axioms := DcpoOfPoset.Build (L A) L_ltHasDLub.
 End Lift.
 
