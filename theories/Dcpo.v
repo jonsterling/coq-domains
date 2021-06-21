@@ -37,11 +37,6 @@ End DLub.
 Hint Extern 0 => apply: dlub_is_lub : core.
 
 
-Definition push_fam {D E : Poset.type} (f : D → E) (F : Family D) : Family E.
-Proof.
-  exists (fam_ix F).
-  by move=>?; apply/f/F.
-Defined.
 
 Definition preserves_dlub {D : Dcpo.type} {E : Poset.type} (f : D → E) :=
   ∀ (A : Family D) (h : is_directed A),
