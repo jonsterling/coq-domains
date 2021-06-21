@@ -55,6 +55,9 @@ Section Bottom.
   Opaque bottom.
 End Bottom.
 
+#[export]
+Hint Extern 0 => apply: bottom_is_bottom : core.
+
 Section Top.
   Context {A : BoundedPoset.type}.
 
@@ -70,6 +73,10 @@ Section Top.
   Definition top_is_top : is_top top := proj2_sig top_bundled.
   Opaque top.
 End Top.
+
+#[export]
+Hint Extern 0 => apply: top_is_top : core.
+
 
 Notation "⊥" := bottom.
 Notation "⊤" := top.
