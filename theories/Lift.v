@@ -227,6 +227,12 @@ Section Alg.
 End Alg.
 
 
+Section Unit.
+  Context {A : Type}.
+  Definition unit : A → L A.
+  Proof. move=> a; exists ⊤ => _; exact: a. Defined.
+End Unit.
+
 Section UniversalProperty.
 
   Context (A : Type) (C : Dcppo.type) (f : A → C).
