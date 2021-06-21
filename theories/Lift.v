@@ -172,7 +172,6 @@ Section Functor.
   Qed.
 End Functor.
 
-
 Section Alg.
   Context (D : Dcppo.type).
 
@@ -225,6 +224,20 @@ Section Unit.
   Definition unit : A → L A.
   Proof. move=> a; exists ⊤ => _; exact: a. Defined.
 End Unit.
+
+Section Monad.
+
+  Definition bind {A B} : (A -> L B) → L A -> L B.
+  Proof.
+    move=>f [d r].
+    exists (∃ z : d, defd (f (r z)))=>y.
+    apply: (f (r (ex_proj1 y))).
+    by exact: ex_proj2 y.
+  Defined.
+
+  Definition flatten {A} : L (L A) -> L A := bind id.
+
+End Monad.
 
 Section UniversalProperty.
 
