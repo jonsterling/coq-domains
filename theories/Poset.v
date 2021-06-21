@@ -142,7 +142,6 @@ Qed.
 Lemma cmp_cont {D E F : Poset.type} (f : D → E) (g : E → F) : is_monotone f → is_continuous f → is_continuous g → is_continuous (g \o f).
 Proof.
   move=> fmono fcont gcont A dirA x xlub.
-  have fxlub: (is_lub (push_fam f A) (f x)); first by apply: fcont.
-  apply: (gcont (push_fam f A) _ (f x)); last by [].
+  apply: (gcont (push_fam f A)); last by apply: fcont.
   by apply: mono_preserves_dir.
 Qed.
