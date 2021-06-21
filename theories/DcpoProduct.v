@@ -113,6 +113,6 @@ Section Product.
         suff: (A i, z.2) ≤ z by case.
         by case: (zub i).
       + case: (nonempty _ h) => i _.
-        case: (zub i); cbn; auto.
+        by case: (zub i).
   Qed.
 End Product.
