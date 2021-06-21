@@ -43,7 +43,6 @@ Proof.
   by move=>?; apply/f/F.
 Defined.
 
-(** TODO: let's replace this with the above. *)
 Definition preserves_dlub {D : Dcpo.type} {E : Poset.type} (f : D → E) :=
   ∀ (A : Family D) (h : is_directed A),
     is_lub (push_fam f A) (f (dlub A h)).
