@@ -48,8 +48,8 @@ Section PathFromLt.
           -- by [].
         * apply: (lub_univ A); auto.
           -- by apply/lub_is_ub/Σ_exists_is_lub.
-          -- replace (dlub A dirA) with p; first by [].
-             by apply: lub_unique; eauto.
+          -- suff: dlub A dirA = p by move=>->.
+             by apply: lub_unique.
       + move=> _.
         case: dirA => [[i _] h].
         apply/ltT/zub; last by [].

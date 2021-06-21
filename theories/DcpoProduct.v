@@ -60,67 +60,59 @@ Section Product.
 
   Lemma fst_continous : is_continuous fst.
   Proof.
-    move=> A dirA //= x xlub; split.
-    - move=> //= i.
-      have: (A i ≤ x).
-      + by apply: lub_is_ub.
-      + by case.
-    - move=> //= y yub.
-      case: (lub_univ A x xlub (y,x.2)).
-      + move=> //= i; split; cbn.
-        * apply: yub.
-        * have: (A i ≤ x).
-          -- by apply: lub_is_ub.
-          -- by case.
-      + done.
+    move=>/= A dirA x xlub; split.
+    - move=>/= i.
+      suff: A i ≤ x by case.
+      by apply: lub_is_ub.
+    - move=>/= y yub.
+      case: (lub_univ A x xlub (y,x.2))=>//.
+      move=>/= i; split=>/=.
+      + by apply: yub.
+      + suff: A i ≤ x by case.
+        by apply: lub_is_ub.
   Qed.
 
   Lemma snd_continous : is_continuous snd.
   Proof.
-    move=> A dirA //= x xlub; split.
-    - move=> //= i.
-      have: (A i ≤ x).
-      + by apply: lub_is_ub.
-      + by case.
-    - move=> //= y yub.
-      case: (lub_univ A x xlub (x.1,y)).
-      + move=> //= i; split; cbn.
-        * have: (A i ≤ x).
-          -- by apply: lub_is_ub.
-          -- by case.
-        * apply: yub.
-      + done.
+    move=>/= A dirA x xlub; split.
+    - move=>/= i.
+      suff: A i ≤ x by case.
+      by apply: lub_is_ub.
+    - move=>/= y yub.
+      case: (lub_univ A x xlub (x.1,y))=>//.
+      move=>/= i; split=>/=.
+      * suff: A i ≤ x by case.
+        by apply: lub_is_ub.
+      * by apply: yub.
   Qed.
 
   Lemma pair_left_continous : ∀ x, is_continuous (pair x).
   Proof.
     move=> x; split.
-    - move=> //= i; split; cbn; first by auto.
+    - move=>/= i; split=>//=.
       by apply: lub_is_ub.
-    - move=> z zub.
-      split; cbn.
+    - move=>/= z zub.
+      split=>/=.
       + case: (nonempty _ h) => i _.
         by case: (zub i).
       + apply: lub_univ; first by eauto.
         move=> i.
-        have: (z.1, A i) ≤ z.
-        * by case: (zub i).
-        * by case.
+        suff: (z.1, A i) ≤ z by case.
+        by case: (zub i).
   Qed.
 
   Lemma pair_right_continous : ∀ x, is_continuous (fun y => pair y x).
   Proof.
     move=> x; split.
-    - move=> //= i; split; cbn; last by auto.
+    - move=>/= i; split=>//=.
       by apply: lub_is_ub.
-    - move=> z zub.
-      split; cbn.
+    - move=>/= z zub.
+      split=>/=.
       + apply: lub_univ; first by eauto.
         move=> i.
-        have: (A i, z.2) ≤ z.
-        * by case: (zub i).
-        * by case.
+        suff: (A i, z.2) ≤ z by case.
+        by case: (zub i).
       + case: (nonempty _ h) => i _.
-        case: (zub i); cbn; auto.
+        by case: (zub i).
   Qed.
 End Product.
