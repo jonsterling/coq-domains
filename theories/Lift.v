@@ -130,7 +130,17 @@ Section Lift.
     Proof. move=> m ?; by apply/lub_unique/L_dlub_is_lub. Qed.
   End Lub.
 
+  Definition L_bot : L A.
+  Proof. by exists False; case. Defined.
+
+  Lemma L_bot_is_bot : is_bottom L_bot.
+  Proof. by move=>?//=; case. Qed.
+
+  Lemma L_has_bot : ∃ x : L A, is_bottom x.
+  Proof. by exists L_bot;apply: L_bot_is_bot. Qed.
+
   HB.instance Definition L_dcpo_axioms := DcpoOfPoset.Build (L A) L_ltHasDLub.
+  HB.instance Definition L_pointed_poset_axioms := PointedPosetOfPoset.Build (L A) L_has_bot.
 End Lift.
 
 Section Functor.
