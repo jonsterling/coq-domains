@@ -272,6 +272,9 @@ Section UniversalProperty.
 
   Definition is_univ_map (h : L A → C) := is_continuous h ∧ (h ⊥ = ⊥) ∧ ∀ x, h (unit x) = f x.
 
+  (** In order to prove that there is at most one map satisfying
+  [is_univ_map], we are going to use the continuity of candidate
+  universal maps with respect to the following directed family. *)
   Section Fam.
     Context (x : L A).
     Local Definition fam : Family (L A).
