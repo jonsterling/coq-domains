@@ -275,6 +275,7 @@ Section UniversalProperty.
   Section Fam.
     Context (x : L A).
     Local Definition fam : Family (L A).
+    Proof.
       exists (sum (defd x) True); case.
       - by move=> z; apply/unit/x/z.
       - move=> _; exact: ⊥.
