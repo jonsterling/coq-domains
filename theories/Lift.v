@@ -247,4 +247,88 @@ Section UniversalProperty.
     - apply: alg_cont.
   Qed.
 
+  Lemma univ_map_strict : univ_map ⊥ = ⊥.
+  Proof.
+    rewrite /univ_map /alg /fmap /=.
+    apply: lub_unique; eauto.
+    rewrite /alg_fam /=.
+    split; last by [].
+    case=> [+ |[]]/=; auto.
+    rewrite (_ : ⊥ = L_bot _); last by [].
+    by apply/bottom_is_unique/L_bot_is_bot.
+  Qed.
+
+  Lemma univ_map_compute : ∀ x, univ_map (unit x) = f x.
+  Proof.
+    move=> x.
+    rewrite /univ_map /unit /fmap /alg /=.
+    apply: lub_unique; eauto.
+    split; first by case.
+    move=> c cub.
+    apply: ltT'.
+    - by apply: cub; left; rewrite Σ_top_rw.
+    - by [].
+  Qed.
+
+  Definition is_univ_map (h : L A → C) := is_continuous h ∧ (h ⊥ = ⊥) ∧ ∀ x, h (unit x) = f x.
+
+  Section Fam.
+    Context (x : L A).
+    Local Definition fam : Family (L A).
+      exists (sum (defd x) True); case.
+      - by move=> z; apply/unit/x/z.
+      - move=> _; exact: ⊥.
+    Defined.
+
+    Local Lemma fam_dir : is_directed fam.
+    Proof.
+      split.
+      - by unshelve esplit; first by right.
+      - case=> [z|[]]; case=> [z'|[]]; (unshelve esplit; first by (left + right)); split; auto.
+        by rewrite (_ : z = z').
+    Qed.
+
+    Local Lemma fam_lub : is_lub fam x.
+    Proof.
+      split.
+      - case=> [z|[]] /=; last by [].
+        apply: L_make_lt=> /= _.
+        by exists z.
+      - move=>/=y yub.
+        apply: L_make_lt => z.
+        have u : (⊤ : Σ) by rewrite Σ_top_rw.
+        have Q := yub (inl z) u.
+        by rewrite -Q /=; split.
+    Qed.
+  End Fam.
+
+  Lemma univ_map_unique : ∀ h h', is_univ_map h → is_univ_map h' → h = h'.
+  Proof.
+    move=> h h' [hcont [hstr hfac]] [h'cont [h'str h'fac]].
+    extensionality x.
+    apply: lub_unique.
+    - apply/hcont/fam_lub/fam_dir.
+    - rewrite (_ : push_fam h (fam x) = push_fam h' (fam x)).
+      + rewrite /push_fam; f_equal.
+        apply: funext; case=> [z|[]] /=.
+        * by rewrite hfac h'fac.
+        * by rewrite hstr h'str.
+      + apply/h'cont/fam_lub/fam_dir.
+  Qed.
+
+  Lemma univ_map_is_univ_map : is_univ_map univ_map.
+  Proof.
+    split; [|split].
+    - apply: univ_map_cont.
+    - apply: univ_map_strict.
+    - apply: univ_map_compute.
+  Qed.
+
+  Lemma universal_property : exists! f, is_univ_map f.
+  Proof.
+    exists univ_map.
+    split.
+    - apply: univ_map_is_univ_map.
+    - by move=> ?; apply/univ_map_unique/univ_map_is_univ_map.
+  Qed.
 End UniversalProperty.
