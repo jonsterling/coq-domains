@@ -192,16 +192,14 @@ Section Alg.
           by replace z' with z.
         * move=> [].
           unshelve esplit; first by left.
-          cbn; split; first by [].
-          apply: bottom_is_bottom.
+          by split.
       - move=> []; case.
         * move=> z.
           unshelve esplit; first by left.
-          cbn; split; last by [].
-          apply: bottom_is_bottom.
+          by split.
         * move=> [].
           unshelve esplit; first by right.
-          by cbn; split.
+          by split.
   Qed.
 
   Definition alg : L D → D.
@@ -214,28 +212,22 @@ Section Alg.
     split.
     - move=> //= i.
       apply: above_lub; first by auto.
-      case.
-      + move=> di.
-        rewrite -(lub_is_ub _ _ xlub i di).
-        by apply: lub_is_ub.
-      + move=> [].
-        apply: bottom_is_bottom.
+      case; last by []; move=> di.
+      rewrite -(lub_is_ub _ _ xlub i di).
+      by apply: lub_is_ub.
     - move=> z zub; cbn.
       rewrite (L_dlub_rw _ _ _ x xlub).
       apply: above_lub; first by auto.
-      case.
-      + move/[dup]; apply: Σ_lub_elim; auto.
-        move=>//= i di u.
-        rewrite -(candidate_dlub_compute _ F dirF u i di).
-        apply: ltT'.
-        * apply: zub i.
-        * cbn.
-          apply: ltT'.
-          -- apply: lub_is_ub; auto.
-             by left.
-          -- auto.
-      + move=> [].
-        apply: bottom_is_bottom.
+      case; last by [].
+      move/[dup]; apply: Σ_lub_elim; auto.
+      move=>//= i di u.
+      rewrite -(candidate_dlub_compute _ F dirF u i di).
+      apply: ltT'.
+      + apply: zub i.
+      + apply: ltT'.
+        * apply: lub_is_ub; auto.
+          by left.
+        * by [].
   Qed.
 End Alg.
 

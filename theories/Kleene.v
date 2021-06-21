@@ -17,9 +17,9 @@ Lemma pow_chain {D : PointedPoset.type} (f : D -> D) n m :
   pow f n ≤ pow f m ∨ pow f m ≤ pow f n.
 Proof.
   move=>Hm; case: (leqP n m)=>H.
-  - left; elim: n m H=>[|? IH] m H /=; first by apply: bottom_is_bottom.
+  - left; elim: n m H=>[|? IH] m H /=; first by [].
     by case: m H=>// ?? /=; apply/Hm/IH.
-  - right; elim: m n H=>[|? IH] n H /=; first by apply: bottom_is_bottom.
+  - right; elim: m n H=>[|? IH] n H /=; first by [].
     by case: n H=>// ?? /=; apply/Hm/IH.
 Qed.
 
@@ -46,11 +46,11 @@ Proof.
     move=> H1 H2.
     apply: (lub_unique (pow_family _)); last by apply: dlub_is_lub.
     split=>/=.
-    + case=>/=; [apply: bottom_is_bottom | apply: H1].
+    + case=>/=; [by [] | apply: H1].
     + move=>? H3; apply: H2; move=>/=i.
       by exact: (H3 (S i)).
   - move=>? H1; apply: dlub_least=>x /=.
-    elim: x=>/=; first by apply: bottom_is_bottom.
+    elim: x=>/=; first by [].
     by move=>??; rewrite -H1; apply: HM.
 Qed.
 
