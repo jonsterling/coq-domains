@@ -54,16 +54,17 @@ Section Map.
 
       Lemma dlub_fun_continuous : is_continuous dlub_fun.
       Proof.
+        apply: preserves_dlub_cont.
         move=> F dirF; split.
         - move=> //= i.
           apply: above_lub; first by apply: dlub_is_lub.
           move=> //= z.
           apply: ltT.
-          + by apply: continuous_to_monotone; [apply: ap_cont | apply: dlub_is_ub].
+          + by apply: cont_mono; [apply: ap_cont | apply: dlub_is_ub].
           + by apply: (dlub_is_ub (push_fam _ A)).
         - move=> z //= H.
           apply: dlub_least => //= x.
-          apply: lub_univ; first by apply: ap_cont.
+          apply: lub_univ; first by [apply: ap_cont; eauto].
           move=> //= y.
           apply: ltT'; first by apply: H.
           by apply: (dlub_is_ub (push_fam _ A)).

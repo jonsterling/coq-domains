@@ -30,7 +30,7 @@ Section PathFromLt.
 
   Lemma dlub_continuous : is_continuous (λ ϕ : Σ, dlub (path_fam ϕ) (path_fam_directed ϕ)).
   Proof.
-    move=> A dirA; split.
+    move=> A dirA p plub; split.
     - move=> //= u; apply: (above_lub _)=>//=; case.
       + move=>s; apply: ltT'.
         * by apply: dlub_is_ub; left; apply: (Σ_lub_intro A _ _ _ s).
@@ -47,7 +47,9 @@ Section PathFromLt.
           -- by apply: lub_is_ub; [apply: dlub_is_lub | left].
           -- by [].
         * apply: (lub_univ A); auto.
-          by apply/lub_is_ub/Σ_exists_is_lub.
+          -- by apply/lub_is_ub/Σ_exists_is_lub.
+          -- replace (dlub A dirA) with p; first by [].
+             by apply: lub_unique; eauto.
       + move=> _.
         case: dirA => [[i _] h].
         apply/ltT/zub; last by [].
@@ -87,7 +89,7 @@ Qed.
 Lemma bwd : ∀ x y : D, x ⟿ y → x ≤ y.
 Proof.
   move=> ? ? [? [<- <-]].
-  by apply/continuous_to_monotone/bottom_is_bottom/ap_cont.
+  by apply/cont_mono/bottom_is_bottom/ap_cont.
 Qed.
 
 Lemma characterization : ∀ x y, (x ≤ y) = (x ⟿ y).

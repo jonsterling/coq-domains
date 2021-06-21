@@ -60,51 +60,48 @@ Section Product.
 
   Lemma fst_continous : is_continuous fst.
   Proof.
-    move=> A dirA.
-    split.
+    move=> A dirA //= x xlub; split.
     - move=> //= i.
-      have: (A i ≤ dlub A dirA).
-      + apply: dlub_is_ub.
+      have: (A i ≤ x).
+      + by apply: lub_is_ub.
       + by case.
-    - move=> //= x xub.
-      case: (dlub_least A dirA (x, (dlub A dirA).2)).
+    - move=> //= y yub.
+      case: (lub_univ A x xlub (y,x.2)).
       + move=> //= i; split; cbn.
-        * apply: xub.
-        * have: (A i ≤ dlub A dirA).
-          -- by apply: dlub_is_ub.
+        * apply: yub.
+        * have: (A i ≤ x).
+          -- by apply: lub_is_ub.
           -- by case.
       + done.
   Qed.
 
   Lemma snd_continous : is_continuous snd.
   Proof.
-    move=> A dirA.
-    split.
+    move=> A dirA //= x xlub; split.
     - move=> //= i.
-      have: (A i ≤ dlub A dirA).
-      + apply: dlub_is_ub.
+      have: (A i ≤ x).
+      + by apply: lub_is_ub.
       + by case.
-    - move=> //= x xub.
-      case: (dlub_least A dirA ((dlub A dirA).1, x)).
+    - move=> //= y yub.
+      case: (lub_univ A x xlub (x.1,y)).
       + move=> //= i; split; cbn.
-        * have: (A i ≤ dlub A dirA).
-          -- by apply: dlub_is_ub.
+        * have: (A i ≤ x).
+          -- by apply: lub_is_ub.
           -- by case.
-        * apply: xub.
+        * apply: yub.
       + done.
   Qed.
 
   Lemma pair_left_continous : ∀ x, is_continuous (pair x).
   Proof.
-    move=> x.
-    split.
+    move=> x; split.
     - move=> //= i; split; cbn; first by auto.
-      apply: dlub_is_ub.
+      by apply: lub_is_ub.
     - move=> z zub.
       split; cbn.
       + case: (nonempty _ h) => i _.
         by case: (zub i).
-      + apply: dlub_least.
+      + apply: lub_univ; first by eauto.
         move=> i.
         have: (z.1, A i) ≤ z.
         * by case: (zub i).
@@ -113,18 +110,17 @@ Section Product.
 
   Lemma pair_right_continous : ∀ x, is_continuous (fun y => pair y x).
   Proof.
-    move=> x.
-    split.
+    move=> x; split.
     - move=> //= i; split; cbn; last by auto.
-      apply: dlub_is_ub.
+      by apply: lub_is_ub.
     - move=> z zub.
       split; cbn.
-      + apply: dlub_least.
+      + apply: lub_univ; first by eauto.
         move=> i.
         have: (A i, z.2) ≤ z.
         * by case: (zub i).
         * by case.
       + case: (nonempty _ h) => i _.
-        by case: (zub i).
+        case: (zub i); cbn; auto.
   Qed.
 End Product.
