@@ -46,7 +46,7 @@ Lemma Σ_top_rw : (⊤ : Σ) = True.
 Proof. by apply: top_is_unique. Qed.
 
 Lemma Σ_bot_rw : (⊥ : Σ) = False.
-Proof. by apply: bottom_is_unique; [done | move=>?]. Qed.
+Proof. by apply: bottom_is_unique=>// ?. Qed.
 
 Lemma Σ_lub_intro (A : Family Σ): ∀ u ϕ, is_lub A ϕ → A u → ϕ.
 Proof. by move=> ???; apply: (lub_is_ub A). Qed.

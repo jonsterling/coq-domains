@@ -131,13 +131,13 @@ Section Lift.
   End Lub.
 
   Definition L_bot : L A.
-  Proof. by exists False; case. Defined.
+  Proof. by exists False. Defined.
 
   Lemma L_bot_is_bot : is_bottom L_bot.
   Proof. by move=>?//=; case. Qed.
 
   Lemma L_has_bot : ∃ x : L A, is_bottom x.
-  Proof. by exists L_bot;apply: L_bot_is_bot. Qed.
+  Proof. by exists L_bot; apply: L_bot_is_bot. Qed.
 
   HB.instance Definition L_dcpo_axioms := DcpoOfPoset.Build (L A) L_ltHasDLub.
   HB.instance Definition L_pointed_poset_axioms := PointedPosetOfPoset.Build (L A) L_has_bot.
@@ -148,31 +148,26 @@ Section Functor.
   Context {A B : Type} (f : A → B).
 
   Definition fmap : L A → L B.
-  Proof. by move=> x; exists (defd x) => z; apply/f/x/z. Defined.
+  Proof. by move=> x; exists (defd x) => z; apply/f/x. Defined.
 
   Lemma fmap_cont : is_continuous fmap.
   Proof.
-    move=> F dirF //= x xlub; split.
-    - move=> //= i; move=> z.
-      rewrite /fmap.
-      rewrite (_ : F i = x); last by [].
+    move=>/= F dirF x xlub; split.
+    - move=> /= i; move=> z.
+      rewrite (_ : F i = x) //.
       by apply: lub_is_ub xlub i z.
-
-    - move=> //= y yub.
+    - move=> /= y yub.
       rewrite (L_dlub_rw _ _ _ x xlub).
-      apply: Σ_lub_elim; first by auto.
-      move=> //= i di.
-      rewrite -(yub i di) => //=.
+      apply: Σ_lub_elim=>//= i di.
+      rewrite -(yub i di) /=.
       f_equal.
       apply: L_ext.
-      + apply: above_lub; eauto.
-        by move=> //= ?.
+      + by apply: above_lub=>//= ?.
       + move=> ?.
-        apply: Σ_lub_intro; eauto.
+        apply: Σ_lub_intro=>//.
         by exact: di.
-      + move=> //= Q/[dup].
-        apply: Σ_lub_elim; first by auto.
-        move=> //= j dj z.
+      + move=> /= Q /[dup].
+        apply: Σ_lub_elim=>//= j dj z.
         by rewrite candidate_dlub_compute.
   Qed.
 End Functor.
@@ -191,36 +186,34 @@ Section Alg.
   Lemma alg_fam_dir (x : L D) : is_directed (alg_fam x).
   Proof.
     split.
-    + by unshelve esplit; first by right.
+    + by split=>//=; right.
     + case=> [z|[]]; case=> [z' | []];
       (unshelve esplit; first by (left + right)); split; try by [].
       by rewrite (_ : z = z').
   Qed.
 
   Definition alg : L D → D.
-  Proof. by move=> x; apply/dlub/alg_fam_dir/x. Defined.
+  Proof. by move=>x; apply/dlub/alg_fam_dir. Defined.
 
   Lemma alg_cont : is_continuous alg.
   Proof.
-    move=> F dirF //= x xlub.
+    move=>/= F dirF x xlub.
     rewrite /alg.
     split.
-    - move=> //= i.
-      apply: above_lub; first by auto.
-      case; last by []; move=> di.
+    - move=>/= i.
+      apply: above_lub=>//.
+      case=>// di.
       rewrite -(lub_is_ub _ _ xlub i di).
       by apply: lub_is_ub.
-    - move=> z zub; cbn.
+    - move=> z zub /=.
       rewrite (L_dlub_rw _ _ _ x xlub).
-      apply: above_lub; first by auto.
-      case; last by [].
-      move/[dup]; apply: Σ_lub_elim; auto.
-      move=>//= i di u.
+      apply: above_lub=>//.
+      case=>// /[dup]; apply: Σ_lub_elim=>//= i di u.
       rewrite -(candidate_dlub_compute _ F dirF u i di).
       apply: ltT'.
       + apply: zub i.
       + apply: ltT'.
-        * apply: lub_is_ub; auto.
+        * apply: lub_is_ub=>//.
           by left.
         * by [].
   Qed.
@@ -250,11 +243,11 @@ Section UniversalProperty.
   Lemma univ_map_strict : univ_map ⊥ = ⊥.
   Proof.
     rewrite /univ_map /alg /fmap /=.
-    apply: lub_unique; eauto.
+    apply: lub_unique=>//.
     rewrite /alg_fam /=.
-    split; last by [].
-    case=> [+ |[]]/=; auto.
-    rewrite (_ : ⊥ = L_bot _); last by [].
+    split=>//.
+    case=> [+ |[]]//=.
+    rewrite (_ : ⊥ = L_bot _) //.
     by apply/bottom_is_unique/L_bot_is_bot.
   Qed.
 
@@ -262,7 +255,7 @@ Section UniversalProperty.
   Proof.
     move=> x.
     rewrite /univ_map /unit /fmap /alg /=.
-    apply: lub_unique; eauto.
+    apply: lub_unique=>//.
     split; first by case.
     move=> c cub.
     apply: ltT'.
@@ -280,36 +273,35 @@ Section UniversalProperty.
     Local Definition fam : Family (L A).
     Proof.
       exists (sum (defd x) True); case.
-      - by move=> z; apply/unit/x/z.
+      - by move=>?; apply/unit/x.
       - move=> _; exact: ⊥.
     Defined.
 
     Local Lemma fam_dir : is_directed fam.
     Proof.
       split.
-      - by unshelve esplit; first by right.
-      - case=> [z|[]]; case=> [z'|[]]; (unshelve esplit; first by (left + right)); split; auto.
+      - by split=>//; right.
+      - case=> [z|[]]; case=> [z'|[]]; (unshelve esplit; first by (left + right)); split=>//.
         by rewrite (_ : z = z').
     Qed.
 
     Local Lemma fam_lub : is_lub fam x.
     Proof.
       split.
-      - case=> [z|[]] /=; last by [].
+      - case=> [z|[]] //=.
         apply: L_make_lt=> /= _.
         by exists z.
       - move=>/=y yub.
         apply: L_make_lt => z.
         have u : (⊤ : Σ) by rewrite Σ_top_rw.
-        have Q := yub (inl z) u.
-        by rewrite -Q /=; split.
+        by rewrite -(yub (inl z) u) /=.
     Qed.
   End Fam.
 
   Lemma univ_map_unique : ∀ h h', is_univ_map h → is_univ_map h' → h = h'.
   Proof.
     move=> h h' [hcont [hstr hfac]] [h'cont [h'str h'fac]].
-    extensionality x.
+    apply: funext=>x.
     apply: lub_unique.
     - apply/hcont/fam_lub/fam_dir.
     - rewrite (_ : push_fam h (fam x) = push_fam h' (fam x)).
