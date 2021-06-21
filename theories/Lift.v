@@ -184,22 +184,9 @@ Section Alg.
   Proof.
     split.
     + by unshelve esplit; first by right.
-    + case.
-      - move=> z; case.
-        * move=> z'.
-          unshelve esplit; first by left.
-          cbn; split; last by [].
-          by replace z' with z.
-        * move=> [].
-          unshelve esplit; first by left.
-          by split.
-      - move=> []; case.
-        * move=> z.
-          unshelve esplit; first by left.
-          by split.
-        * move=> [].
-          unshelve esplit; first by right.
-          by split.
+    + case=> [z|[]]; case=> [z' | []];
+      (unshelve esplit; first by (left + right)); split; try by [].
+      by rewrite (_ : z = z').
   Qed.
 
   Definition alg : L D → D.
