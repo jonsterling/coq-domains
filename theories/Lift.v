@@ -84,9 +84,9 @@ Section Lift.
       exists (F i x); split=>//.
       move=> j; move: x.
       case: (predirected _ dirF i j) => k [ik jk] x y.
-      generalize y x.
-      rewrite (ik x) (jk y).
-      by move=> a b; rewrite (_ : a = b).
+      move: {+}y {+}x.
+      rewrite (ik x) (jk y) => ??.
+      by congr (F _ _).
     Defined.
 
     Definition candidate_dlub_compute : ∀ Q i x, F i x = candidate_dlub Q.
@@ -119,8 +119,7 @@ Section Lift.
           rewrite (_ : H'' = x) //; move: H''.
           apply: Σ_lub_elim=>//= i z.
           rewrite -(candidate_dlub_compute x i).
-          generalize z.
-          by rewrite (H i z)=> ?; f_equal.
+          by move: {+}z; rewrite (H i z) => ?; congr (m _).
     Qed.
 
     Lemma L_ltHasDLub : ∃ m : L A, is_lub F m.
@@ -160,7 +159,7 @@ Section Functor.
       rewrite (L_dlub_rw _ _ _ x xlub).
       apply: Σ_lub_elim=>//= i di.
       rewrite -(yub i di) /=.
-      f_equal.
+      congr (fmap _).
       apply: L_ext.
       + by apply: above_lub=>//= ?.
       + move=> ?.
@@ -318,7 +317,7 @@ Section UniversalProperty.
     apply: lub_unique.
     - apply/hcont/fam_lub/fam_dir.
     - rewrite (_ : push_fam h (fam x) = push_fam h' (fam x)).
-      + rewrite /push_fam; f_equal.
+      + rewrite /push_fam; congr Build_Family.
         apply: funext; case=> [z|[]] /=.
         * by rewrite hfac h'fac.
         * by rewrite hstr h'str.
