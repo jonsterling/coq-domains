@@ -236,6 +236,13 @@ Section Monad.
 
   Definition flatten {A} : L (L A) -> L A := bind id.
 
+  Lemma bind_monotone {A B} (f : A -> L B) : is_monotone (bind f).
+  Proof.
+    move=>/= x y H; move=>/=H0.
+    rewrite (_ : x = y) //.
+    by apply/H/(ex_proj1 H0).
+  Qed.
+
 End Monad.
 
 Section UniversalProperty.
