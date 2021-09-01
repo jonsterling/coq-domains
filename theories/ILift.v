@@ -150,24 +150,18 @@ Section Functor.
       case: (lub_is_ub _ _ xlub i)=> H0 H1.
       split=>//=??.
       by rewrite H1.
-    - move=> /= y yub; split.
+    - move=> /= y yub.
+      rewrite (IL_dlub_rw _ _ _ x xlub).
+      split.
       + move=> u.
-        rewrite (IL_dlub_rw _ _ _ x xlub) //=.
         apply: UNat_lub_elim=>//= i k hk.
         by case: (yub i)=>??; auto.
-      + rewrite (IL_dlub_rw _ _ _ x xlub); case.
-        apply: UNat_lub_elim_dep=>//= i h0 h1 h2 h3.
-        case: (yub i) => h4 //= h5.
-        rewrite -h5.
+      + case; apply: UNat_lub_elim_dep=>//= i ? h ? ?.
+        case: (yub i) => _ /= <-.
         * move=> ?.
           rewrite candidate_dlub_compute.
-          ** move=> ?.
-             congr (f _).
-             congr (candidate_dlub _ _ _ _).
-             auto.
-          ** esplit; apply: UNat_lub_intro; eauto.
-             exact: h1.
-        * esplit.
-          exact: h1.
+          ** by move=> ?; congr (f (candidate_dlub _ _ _ _)).
+          ** by esplit; apply: UNat_lub_intro; [eauto | exact: h].
+        * esplit; eauto.
   Qed.
 End Functor.
