@@ -71,11 +71,16 @@ Qed.
 
 HB.instance Definition UNat_dcpo_axioms := DcpoOfPoset.Build UNat UNat_ltHasDLubs.
 
+Definition UNat_bot : UNat.
+Proof. by exists (λ _, False). Defined.
+
+Lemma UNat_bot_is_bot : is_bottom UNat_bot.
+Proof. by move=> ?. Qed.
+
 Lemma UNat_ltHasBot : ∃ x : UNat, is_bottom x.
 Proof.
-  unshelve esplit.
-  - by exists (λ _, False).
-  - by move=> ?.
+  exists UNat_bot.
+  apply: UNat_bot_is_bot.
 Qed.
 
 Lemma UNat_ltHasTop : ∃ x : UNat, is_top x.
@@ -90,3 +95,34 @@ HB.instance Definition UNat_pointed_poset_axioms :=
 
 HB.instance Definition UNat_bounded_poset_axioms :=
   BoundedPosetOfPointedPoset.Build UNat UNat_ltHasTop.
+
+Lemma UNat_lub_intro (A : Family UNat): ∀ u k ϕ, is_lub A ϕ → sval (A u) k → sval ϕ k.
+Proof. by move=>????; apply: (lub_is_ub A). Qed.
+
+Lemma UNat_lub_elim {P : UNat} {Q : nat → Prop} {A} (H : is_lub A P) : (∀ i k (z : sval (A i) k), Q k) → ∀ x (w : sval P x), Q x.
+Proof.
+  move=> J K.
+  rewrite -(lub_unique _ _ _ (UNat_exists_is_lub _) H).
+  by case=> ?; apply: J.
+Qed.
+
+
+
+Lemma UNat_bot_elim : ∀ A, ∀ z : UNat_defd ⊥, A z.
+Proof.
+  rewrite (_ : ⊥ = UNat_bot).
+  - by apply/bottom_is_unique/UNat_bot_is_bot.
+  - move=> ? h.
+    suff: False; first by [].
+    by case: h.
+Qed.
+
+Lemma UNat_lub_elim_dep {P : UNat} {Q : ∀ x, sval P x → Prop} {A} (H : is_lub A P) : (∀ i k (z : sval (A i) k) w, Q k w) → ∀ x (w : sval P x), Q x w.
+Proof.
+  move=> J K.
+  have L := eq_sym (lub_unique _ _ _ (UNat_exists_is_lub _) H).
+  dependent destruction L.
+  case=> ? ?.
+  apply: J.
+  eauto.
+Qed.
