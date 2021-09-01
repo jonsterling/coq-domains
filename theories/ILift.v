@@ -165,3 +165,50 @@ Section Functor.
         * esplit; eauto.
   Qed.
 End Functor.
+
+Section Unit.
+
+  Context {A : Type}.
+
+  Definition unit : A → IL A.
+  Proof. by move=> a; exists ⊤=> ?; exact: a. Defined.
+
+End Unit.
+
+Section Monad.
+
+  Definition bind {A B} : (A → IL B) → IL A → IL B.
+  Proof.
+    move=>f a.
+    unshelve esplit.
+    - unshelve apply: UNat_dsum.
+      + exact: beh a.
+      + move=> k hk.
+        apply: beh.
+        apply: f.
+        apply a.
+        by exists k.
+    - simpl.
+      move=> h.
+      apply: (iota (λ b : B, ∀ u v, f (a u) v = b)).
+      case: h=> u [v [w [hv [hw]]]] [vu wu].
+      pose a' := a (ex_intro _ _ hv).
+      pose b' := f a' (ex_intro _ _ hw).
+      exists b'; split.
+      + move=> [u' hu'] [v' hv'].
+        rewrite /b' /a'.
+        move: (ex_intro _ v' hv').
+        move: (ex_intro _ w hw).
+        move: (ex_intro _ v hv).
+        move: (ex_intro _ u' hu').
+        move=> h h'.
+        rewrite (_ : h' = h); first by auto.
+        move {h'}.
+        move=> e e'.
+        by rewrite (_ : e' = e); first by auto.
+      + move=> z hz.
+        rewrite /b' /a'.
+        by rewrite -(hz (ex_intro _ _ hv) (ex_intro _ _ hw)).
+  Defined.
+
+End Monad.
