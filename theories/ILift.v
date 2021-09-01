@@ -135,3 +135,39 @@ Section Lift.
   HB.instance Definition IL_dcpo_axioms := DcpoOfPoset.Build (IL A) IL_ltHasDLub.
   HB.instance Definition IL_pointed_poset_axioms := PointedPosetOfPoset.Build (IL A) IL_has_bot.
 End Lift.
+
+
+Section Functor.
+  Context {A B : Type} (f : A → B).
+
+  Definition fmap : IL A → IL B.
+  Proof. by move=> x; exists (beh x) => z; apply/f/x. Defined.
+
+  Lemma fmap_cont : is_continuous fmap.
+  Proof.
+    move=>/= F dirF x xlub; split.
+    - move=> /= i.
+      case: (lub_is_ub _ _ xlub i)=> H0 H1.
+      split=>//=??.
+      by rewrite H1.
+    - move=> /= y yub; split.
+      + move=> u.
+        rewrite (IL_dlub_rw _ _ _ x xlub) //=.
+        apply: UNat_lub_elim=>//= i k hk.
+        by case: (yub i)=>??; auto.
+      + rewrite (IL_dlub_rw _ _ _ x xlub); case.
+        apply: UNat_lub_elim_dep=>//= i h0 h1 h2 h3.
+        case: (yub i) => h4 //= h5.
+        rewrite -h5.
+        * move=> ?.
+          rewrite candidate_dlub_compute.
+          ** move=> ?.
+             congr (f _).
+             congr (candidate_dlub _ _ _ _).
+             auto.
+          ** esplit; apply: UNat_lub_intro; eauto.
+             exact: h1.
+        * esplit.
+          exact: h1.
+  Qed.
+End Functor.
