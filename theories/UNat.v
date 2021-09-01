@@ -6,6 +6,9 @@ From Domains Require Import Preamble Preorder Poset Dcpo.
 Definition UNat : Type :=
   {P : nat → Prop | ∀ m n : nat, m <= n → P m → P n}.
 
+Definition UNat_defd : UNat → Prop :=
+  λ x, ∃ k, sval x k.
+
 Definition UNat_lt (M N : UNat) :=
   ∀ x, sval M x → sval N x.
 
