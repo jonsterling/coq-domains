@@ -1,4 +1,4 @@
-Require Import Lia.
+From Coq Require Import Arith.PeanoNat.
 From Domains Require Import Preamble Preorder Poset Dcpo.
 
 (** The "upper naturals" *)
@@ -22,12 +22,10 @@ HB.instance Definition UNat_preorder_axioms := PreorderOfType.Build UNat UNat_lt
 
 Lemma UNat_ltE : ∀ x y : UNat, (x ≤ y) → (y ≤ x) → x = y.
 Proof.
-  move=> x y xy yz.
-  apply: eq_sig; last by [].
-  apply: funext=> k.
-  apply: propext; split.
-  - apply: xy.
-  - apply: yz.
+  move=>x y xy yz.
+  apply: eq_sig=>//.
+  apply: funext=>k.
+  by apply: propext; split; [apply: xy | apply: yz].
 Qed.
 
 HB.instance Definition UNat_poset_axioms := PosetOfPreorder.Build UNat UNat_ltE.
@@ -36,23 +34,20 @@ Definition UNat_dsum (x : UNat) (y : ∀ u, sval x u → UNat) : UNat.
 Proof.
   unshelve esplit.
   - move=> k.
-    refine (∃ u v, ∃ h : sval x u, sval (y u h) v ∧ u <= k /\ v <= k).
+    by exact: (∃ u v (h : sval x u), sval (y u h) v ∧ u <= k ∧ v <= k).
   - abstract
-      (move=> m n mn /= [u [v [hu [hv [um vm]]]]];
-       exists u, v, hu; split;
-       [apply: hv | lia]).
+     (by move=> m n mn /= [u][v][hu][hv][um vm];
+      exists u, v, hu; do!split=>//; apply: (Nat.le_trans _ m)).
 Defined.
 
 Definition UNat_exists (I : Type) (y : I → UNat) : UNat.
 Proof.
   unshelve esplit.
   - move=> k.
-    refine (exists x, sval (y x) k).
+    by exact: (∃ x, sval (y x) k).
   - abstract
       (by move=> m n mn /= [x hx];
-          exists x; move: hx;
-          move: {y} (y x) => y;
-          apply: (proj2_sig y)).
+       exists x; apply: (proj2_sig (y x) m)).
 Defined.
 
 Lemma UNat_exists_is_lub : ∀ (A : Family UNat), is_lub A (UNat_exists _ A).
@@ -78,16 +73,11 @@ Lemma UNat_bot_is_bot : is_bottom UNat_bot.
 Proof. by move=> ?. Qed.
 
 Lemma UNat_ltHasBot : ∃ x : UNat, is_bottom x.
-Proof.
-  exists UNat_bot.
-  apply: UNat_bot_is_bot.
-Qed.
+Proof. by exists UNat_bot; apply: UNat_bot_is_bot. Qed.
 
 Lemma UNat_ltHasTop : ∃ x : UNat, is_top x.
 Proof.
-  unshelve esplit.
-  - by exists (λ _, True).
-  - by move=> ?.
+  by unshelve esplit; first by exists (λ _, True).
 Qed.
 
 HB.instance Definition UNat_pointed_poset_axioms :=
@@ -106,15 +96,12 @@ Proof.
   by case=> ?; apply: J.
 Qed.
 
-
-
 Lemma UNat_bot_elim : ∀ A, ∀ z : UNat_defd ⊥, A z.
 Proof.
   rewrite (_ : ⊥ = UNat_bot).
   - by apply/bottom_is_unique/UNat_bot_is_bot.
-  - move=> ? h.
-    suff: False; first by [].
-    by case: h.
+  - move=>? h.
+    by exfalso; case: h.
 Qed.
 
 Lemma UNat_lub_elim_dep {P : UNat} {Q : ∀ x, sval P x → Prop} {A} (H : is_lub A P) : (∀ i k (z : sval (A i) k) w, Q k w) → ∀ x (w : sval P x), Q x w.
@@ -122,7 +109,6 @@ Proof.
   move=> J K.
   have L := eq_sym (lub_unique _ _ _ (UNat_exists_is_lub _) H).
   dependent destruction L.
-  case=> ? ?.
-  apply: J.
-  eauto.
+  case=> ? X.
+  by apply/J/X.
 Qed.

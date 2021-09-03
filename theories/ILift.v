@@ -16,8 +16,8 @@ Proof.
   have Q: bm = bn by apply: ltE.
   dependent destruction Q.
   rewrite (_ : rm = rn) //.
-  apply: funext=> z.
-  by rewrite (h z z).
+  apply: funext=>?.
+  by apply: h.
 Qed.
 
 Section Lift.
@@ -28,8 +28,7 @@ Section Lift.
 
   Lemma IL_ltR : ∀ m, IL_lt m m.
   Proof.
-    move=> m; split; first by [].
-    move=> u v.
+    move=> m; split=>// u v.
     by rewrite (_ : u = v).
   Qed.
 
@@ -37,9 +36,9 @@ Section Lift.
   Proof.
     move=> m n o [mn0 mn1] [no0 n1].
     split.
-    - apply: ltT mn0 no0.
+    - by apply: ltT mn0 no0.
     - move=> u v.
-      rewrite mn1; first by [].
+      rewrite mn1 //.
       case: u=> k ?.
       by exists k; apply: mn0.
   Qed.
@@ -61,24 +60,20 @@ Section Lift.
       - by case: (nonempty _ dirF).
       - move=> //= i j.
         case: (predirected _ dirF i j)=> k [[ik0 ik1] [jk0 jk1]].
-        exists k; split; move=> ?.
-        + apply: ik0.
-        + apply: jk0.
+        by exists k; split; move=> ?; [apply: ik0 | apply: jk0].
     Qed.
 
     Definition candidate_dlub : UNat_defd (dlub (push_fam (λ x : IL A, beh x) F) directed_defd_fam) → A.
     Proof.
       move=> Q; apply: (iota (λ a, ∀ i x, F i x = a)); move: Q.
       case=> x.
-      apply: UNat_lub_elim=>//.
-      move=>/=i y u.
+      apply: UNat_lub_elim=>//= i y u.
       unshelve esplit.
       - apply: F.
-        by exists y; eauto.
-      - split=>//.
-        move=> j.
+        by exists y; apply: u.
+      - split=>// j.
         case: (predirected _ dirF i j)=> k [[ik0 ik1] [jk0 jk1]] [z w].
-        rewrite jk1//.
+        rewrite jk1 //.
         by exists z; apply: jk0.
     Defined.
 
@@ -112,7 +107,7 @@ Section Lift.
           move=> i k hk w [l hl].
           rewrite -(candidate_dlub_compute _ i (ex_intro _ _ hk)).
           case: (H i)=> Hi0 Hi1.
-          apply: Hi1.
+          by apply: Hi1.
     Qed.
 
     Lemma IL_ltHasDLub : ∃ m : IL A, is_lub F m.
@@ -124,7 +119,7 @@ Section Lift.
 
 
   Definition IL_bot : IL A.
-  Proof. exists ⊥; apply: UNat_bot_elim. Defined.
+  Proof. by exists ⊥; apply: UNat_bot_elim. Defined.
 
   Lemma IL_bot_is_bot : is_bottom IL_bot.
   Proof. by move=> ?; split=>//; apply: UNat_bot_elim. Qed.
@@ -155,14 +150,14 @@ Section Functor.
       split.
       + move=> u.
         apply: UNat_lub_elim=>//= i k hk.
-        by case: (yub i)=>??; auto.
+        by case: (yub i)=>X ?; apply: X.
       + case; apply: UNat_lub_elim_dep=>//= i ? h ? ?.
         case: (yub i) => _ /= <-.
         * move=> ?.
           rewrite candidate_dlub_compute.
           ** by move=> ?; congr (f (candidate_dlub _ _ _ _)).
-          ** by esplit; apply: UNat_lub_intro; [eauto | exact: h].
-        * esplit; eauto.
+          ** by esplit; apply: UNat_lub_intro; [apply: dlub_is_lub | exact: h].
+        * by esplit; exact: h.
   Qed.
 End Functor.
 
@@ -181,15 +176,10 @@ Section Monad.
   Proof.
     move=>f a.
     unshelve esplit.
-    - unshelve apply: UNat_dsum.
-      + exact: beh a.
-      + move=> k hk.
-        apply: beh.
-        apply: f.
-        apply a.
-        by exists k.
-    - simpl.
-      move=> h.
+    - apply: (UNat_dsum (beh a))=> k hk.
+      apply/beh/f/a.
+      by exists k.
+    - move=>/= h.
       apply: (iota (λ b : B, ∀ u v, f (a u) v = b)).
       case: h=> u [v [w [hv [hw]]]] [vu wu].
       pose a' := a (ex_intro _ _ hv).
@@ -202,10 +192,8 @@ Section Monad.
         move: (ex_intro _ v hv).
         move: (ex_intro _ u' hu').
         move=> h h'.
-        rewrite (_ : h' = h); first by auto.
-        move {h'}.
-        move=> e e'.
-        by rewrite (_ : e' = e); first by auto.
+        rewrite (_ : h' = h) // => {h'} e e'.
+        by rewrite (_ : e' = e).
       + move=> z hz.
         rewrite /b' /a'.
         by rewrite -(hz (ex_intro _ _ hv) (ex_intro _ _ hw)).
