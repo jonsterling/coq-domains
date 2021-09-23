@@ -112,8 +112,7 @@ Lemma fp_induction {D : Dcppo.type} (S : D → Prop) (f : map D D) :
 Proof.
   move=> [botS dlubS] ih.
   case: (dlubS (pow_family (sval f))); first by apply/pow_chain_directed/cont_mono/(svalP f).
-  move=> fix_f.
-  move=> [fix_f_lub H].
+  move=> fix_f [fix_f_lub H].
   rewrite (_ : fix_ f = fix_f); first by [].
-  apply: lub_unique; eauto.
+  by apply: lub_unique.
 Qed.
