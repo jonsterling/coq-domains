@@ -36,23 +36,48 @@ Qed.
 Definition is_least_fixpoint {D : Poset.type} (f : D -> D) (x : D) :=
   f x = x ∧ ∀ y, f y = y -> x ≤ y.
 
+
+Definition fix_ {D : Dcppo.type} (f : map D D) : D.
+Proof.
+  apply/(dlub (pow_family (sval f)))/pow_chain_directed/cont_mono.
+  by case: f.
+Defined.
+
+Lemma fix_is_lub {D : Dcppo.type} (f : map D D) : is_lub (pow_family (sval f)) (fix_ f).
+Proof. by apply: dlub_is_lub. Qed.
+
+Lemma fix_is_lfp {D : Dcppo.type} (f : map D D) : is_least_fixpoint (sval f) (fix_ f).
+  split.
+  - case: (svalP f (pow_family (sval f)) _ (fix_ f)).
+    + by apply/pow_chain_directed/cont_mono/(svalP f).
+    + by [].
+    + move=> H1 H2.
+      apply: (lub_unique (pow_family _)); last by apply: dlub_is_lub.
+      split=>/=.
+      * by case=>//=; apply: H1.
+      * move=>? H3; apply: H2; move=>/=i.
+        by exact: (H3 (S i)).
+  - move=>? H1; apply: dlub_least=> x /=.
+    elim: x=>//=.
+    move=>??; rewrite -H1.
+    apply: cont_mono; last by [].
+    by apply: svalP f.
+Qed.
+
+Opaque fix_.
+
+Lemma fix_is_fp {D : Dcppo.type} (f : map D D) : fix_ f = sval f (fix_ f).
+Proof. by case: (fix_is_lfp f)=> ->. Qed.
+
+
 Theorem kleene_lfp {D : Dcppo.type} (f : map D D) :
   ∃ x, is_lub (pow_family (ap f)) x ∧ is_least_fixpoint (ap f) x.
 Proof.
-  case: f=>f /[dup]/cont_mono/[dup]/pow_chain_directed HD HM H /=.
-  exists (dlub _ HD); split; first by apply: dlub_is_lub.
-  split.
-  - case: (H _ HD (dlub (pow_family f) HD)); first by auto.
-    move=> H1 H2.
-    apply: (lub_unique (pow_family _)); last by apply: dlub_is_lub.
-    split=>/=.
-    + by case=>//=; apply: H1.
-    + move=>? H3; apply: H2; move=>/=i.
-      by exact: (H3 (S i)).
-  - move=>? H1; apply: dlub_least=>x /=.
-    elim: x=>//=.
-    by move=>??; rewrite -H1; apply: HM.
+  exists (fix_ f); split.
+  - apply: fix_is_lub.
+  - apply: fix_is_lfp.
 Qed.
+
 
 Lemma map_pow_monotone {D : Dcppo.type} n :
   is_monotone (λ f : map D D, pow (ap f) n).
