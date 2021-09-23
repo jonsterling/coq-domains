@@ -10,6 +10,22 @@ Definition iota {X : Type} (P : X → Prop) (h : exists! x, P x) : X :=
 Lemma iota_prop {X : Type} (P : X → Prop) (h : exists! x, P x) : P (iota P h).
 Proof. rewrite /iota; apply proj2_sig. Qed.
 
+Definition extract {X : Type} {P : X → Prop} : (∀ x y, P x → P y → x = y) → (∃ x, P x) → X.
+Proof.
+  move=> H J.
+  apply: (@iota X P).
+  case: J=> x xP.
+  exists x; split; first by [].
+  by move=> ??; apply: H.
+Defined.
+
+Definition extract_prop {X : Type} {P : X → Prop} : ∀ H J, P (@extract X P H J).
+Proof.
+  move=> ? ?.
+  apply: iota_prop.
+Qed.
+
+Opaque extract.
 
 Module Im.
   Section Im.
