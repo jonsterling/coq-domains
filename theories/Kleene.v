@@ -96,3 +96,24 @@ Proof.
   move=>i j; case: (predirected _ H i j)=>/= x [??].
   by exists x; split; apply: map_pow_monotone.
 Qed.
+
+
+
+Definition closed_under_dlub {D : Dcppo.type} (S : D → Prop) :=
+  ∀ (A : Family D), is_directed A → ∃ x, is_lub A x ∧ S x.
+
+Definition admissible {D : Dcppo.type} (S : D → Prop) :=
+  S ⊥ ∧ closed_under_dlub S.
+
+Lemma fp_induction {D : Dcppo.type} (S : D → Prop) (f : map D D) :
+  admissible S
+  → (∀ d, S d → S (sval f d))
+  → S (fix_ f).
+Proof.
+  move=> [botS dlubS] ih.
+  case: (dlubS (pow_family (sval f))); first by apply/pow_chain_directed/cont_mono/(svalP f).
+  move=> fix_f.
+  move=> [fix_f_lub H].
+  rewrite (_ : fix_ f = fix_f); first by [].
+  apply: lub_unique; eauto.
+Qed.
