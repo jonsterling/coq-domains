@@ -99,8 +99,8 @@ Qed.
 
 
 
-Definition closed_under_dlub {D : Dcppo.type} (S : D → Prop) :=
-  ∀ (A : Family D), is_directed A → ∃ x, is_lub A x ∧ S x.
+Definition closed_under_dlub {D : Dcpo.type} (S : D → Prop) :=
+  ∀ (A : Family D), is_directed A → (∀ x, S (A x)) → ∃ x, is_lub A x ∧ S x.
 
 Definition admissible {D : Dcppo.type} (S : D → Prop) :=
   S ⊥ ∧ closed_under_dlub S.
@@ -112,7 +112,8 @@ Lemma fp_induction {D : Dcppo.type} (S : D → Prop) (f : map D D) :
 Proof.
   move=> [botS dlubS] ih.
   case: (dlubS (pow_family (sval f))); first by apply/pow_chain_directed/cont_mono/(svalP f).
-  move=> fix_f [fix_f_lub H].
-  rewrite (_ : fix_ f = fix_f); first by [].
-  by apply: lub_unique.
+  - by elim=>//=??; apply: ih.
+  - move=> fix_f [fix_f_lub H].
+    rewrite (_ : fix_ f = fix_f); first by [].
+    by apply: lub_unique.
 Qed.
