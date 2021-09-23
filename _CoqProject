@@ -8,8 +8,10 @@ theories/Dcpo.v
 theories/DcpoExponential.v
 theories/DcpoProduct.v
 theories/Sierpinski.v
+theories/UNat.v
 theories/Path.v
 theories/Lift.v
 theories/ClosedModality.v
 theories/Kleene.v
+theories/ILift.v
 
