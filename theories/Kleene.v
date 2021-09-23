@@ -36,7 +36,6 @@ Qed.
 Definition is_least_fixpoint {D : Poset.type} (f : D -> D) (x : D) :=
   f x = x ∧ ∀ y, f y = y -> x ≤ y.
 
-
 Definition fix_ {D : Dcppo.type} (f : map D D) : D.
 Proof.
   apply/(dlub (pow_family (sval f)))/pow_chain_directed/cont_mono.
@@ -48,9 +47,8 @@ Proof. by apply: dlub_is_lub. Qed.
 
 Lemma fix_is_lfp {D : Dcppo.type} (f : map D D) : is_least_fixpoint (sval f) (fix_ f).
   split.
-  - case: (svalP f (pow_family (sval f)) _ (fix_ f)).
+  - case: (svalP f (pow_family (sval f)) _ (fix_ f))=>//.
     + by apply/pow_chain_directed/cont_mono/(svalP f).
-    + by [].
     + move=> H1 H2.
       apply: (lub_unique (pow_family _)); last by apply: dlub_is_lub.
       split=>/=.
@@ -60,7 +58,7 @@ Lemma fix_is_lfp {D : Dcppo.type} (f : map D D) : is_least_fixpoint (sval f) (fi
   - move=>? H1; apply: dlub_least=> x /=.
     elim: x=>//=.
     move=>??; rewrite -H1.
-    apply: cont_mono; last by [].
+    apply: cont_mono=>//.
     by apply: svalP f.
 Qed.
 
@@ -111,9 +109,10 @@ Lemma fp_induction {D : Dcppo.type} (S : D → Prop) (f : map D D) :
   → S (fix_ f).
 Proof.
   move=> [botS dlubS] ih.
-  case: (dlubS (pow_family (sval f))); first by apply/pow_chain_directed/cont_mono/(svalP f).
+  case: (dlubS (pow_family (sval f))).
+  - by apply/pow_chain_directed/cont_mono/(svalP f).
   - by elim=>//=??; apply: ih.
   - move=> fix_f [fix_f_lub H].
-    rewrite (_ : fix_ f = fix_f); first by [].
+    rewrite (_ : fix_ f = fix_f) //.
     by apply: lub_unique.
 Qed.

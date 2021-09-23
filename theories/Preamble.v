@@ -15,8 +15,8 @@ Proof.
   move=> H J.
   apply: (@iota X P).
   case: J=> x xP.
-  exists x; split; first by [].
-  by move=> ??; apply: H.
+  exists x; split=>//.
+  by move=>?; apply: H.
 Defined.
 
 Definition extract_prop {X : Type} {P : X → Prop} : ∀ H J, P (@extract X P H J).
