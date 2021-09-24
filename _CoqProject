@@ -13,5 +13,6 @@ theories/Path.v
 theories/Lift.v
 theories/ClosedModality.v
 theories/Kleene.v
+theories/Subdomain.v
 theories/ILift.v
 
