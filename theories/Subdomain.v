@@ -1,6 +1,6 @@
 From Coq Require Import ssrbool.
 From mathcomp Require Import ssrnat.
-From Domains Require Import Preamble Preorder Poset Dcpo DcpoExponential Kleene.
+From Domains Require Import Preamble Preorder Poset Dcpo DcpoExponential Kleene Lift Sierpinski.
 
 Set Bullet Behavior "Strict Subproofs".
 
@@ -67,3 +67,48 @@ Section PredFunSpace.
       by apply: admiss_has_dlub.
   Qed.
 End PredFunSpace.
+
+Section PredLift.
+  Context (D : Type) (D' : D → Prop).
+
+  Definition pred_lift : L D → Prop :=
+    λ m,
+    ∀ z : defd m,
+      D' (m z).
+
+
+  Lemma pred_lift_has_bot : has_bot pred_lift.
+  Proof.
+    move=> x xbot.
+    rewrite (_ : x = L_bot _) //.
+    apply: bottom_is_unique=>//.
+    apply: L_bot_is_bot.
+  Qed.
+
+  Lemma pred_lift_has_dlub : has_dlub pred_lift.
+  Proof.
+    move=> A dirA hA x xlub.
+    rewrite (_ : x = L_dlub _ A dirA).
+    - move=> z.
+      suff: (∃ i, defd (A i)).
+      + case=> i Ai_defd.
+        rewrite /L_dlub//=.
+        rewrite <- (candidate_dlub_compute D A dirA z i Ai_defd).
+        apply: hA.
+      + rewrite /L_dlub//= in z.
+        move: z.
+        apply: Σ_lub_elim.
+        * by eauto.
+        * move=> //=i z.
+          by exists i.
+    - apply: lub_unique; eauto.
+      apply: L_dlub_is_lub.
+  Qed.
+
+  Lemma pred_lift_admiss : admissible pred_lift.
+  Proof.
+    split.
+    - apply: pred_lift_has_bot.
+    - apply: pred_lift_has_dlub.
+  Qed.
+End PredLift.
