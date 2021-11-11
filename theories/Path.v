@@ -2,8 +2,7 @@ From Domains Require Import Preamble Preorder Poset Dcpo Sierpinski DcpoExponent
 
 Context (D : Dcpo.type).
 
-Local Notation Σ := Sierpinski_Σ_canonical_Dcpo.
-Definition Path := map Σ D.
+Definition Path := map (HB.pack Σ) D.
 
 Lemma lub_intro (A : Family Σ): ∀ u ϕ, is_lub A ϕ → A u → ϕ.
 Proof. by move=> u ϕ ϕlub; apply: (lub_is_ub A). Qed.
