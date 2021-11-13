@@ -28,8 +28,8 @@ Proof. by case. Qed.
 Definition fam_adjoin_elt {D : Poset.type} (A : Family D) (x : D) : Family D.
 Proof.
   exists (sum True (fam_ix A)); case.
-  - move=> _; exact: x.
-  - apply: A.
+  - by move=> _; exact: x.
+  - by apply: A.
 Defined.
 
 Lemma fam_adjoin_bot_directed {D : PointedPoset.type} (A : Family D) (hA : is_predirected A) : is_directed (fam_adjoin_elt A ⊥).
@@ -54,12 +54,11 @@ Proof.
   - move=> xlub.
     split.
     + case; try by [].
-      move=> i//=.
+      move=> ?//=.
       by apply: lub_is_ub.
     + move=> v vub.
       apply: lub_univ; eauto.
-      move=> i.
-      by apply: (vub (inr i)).
+      by move=> i; apply: (vub (inr i)).
   - move=> xlub.
     split.
     + move=> i.
@@ -67,8 +66,8 @@ Proof.
       by apply: lub_is_ub.
     + move=> v vub.
       apply: lub_univ.
-      * apply: xlub.
-      * case; try by [].
+      * by apply: xlub.
+      * by case.
 Qed.
 
 (* Even in a constructve setting, having predirected suprema is equivalent to being admissible.
@@ -80,10 +79,9 @@ Proof.
   move=> admS F pdirF hF x xlub.
   apply: admiss_has_dlub.
   - by apply: admS.
-  - by apply: (fam_adjoin_bot_directed F pdirF).
+  - by apply: fam_adjoin_bot_directed F pdirF.
   - case.
-    + case.
-      by apply: admiss_has_bot.
+    + by case; apply: admiss_has_bot.
     + by apply: hF.
   - by rewrite -fam_adjoin_bot_same_lub.
 Qed.
