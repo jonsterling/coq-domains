@@ -5,8 +5,12 @@ From Domains Require Import Preamble Preorder Poset Dcpo DcpoExponential Kleene 
 Set Bullet Behavior "Strict Subproofs".
 
 
+
 Definition has_dlub {D : Dcpo.type} (S : D → Prop) :=
   ∀ (A : Family D), is_directed A → (∀ x, S (A x)) → ∀ x, is_lub A x → S x.
+
+Definition has_pdlub {D : Dcpo.type} (S : D → Prop) :=
+  ∀ (A : Family D), is_predirected A → (∀ x, S (A x)) → ∀ x, is_lub A x → S x.
 
 Definition has_bot {D : Dcpo.type} (S : D → Prop) :=
   ∀ x, is_bottom x → S x.
@@ -14,11 +18,88 @@ Definition has_bot {D : Dcpo.type} (S : D → Prop) :=
 Definition admissible {D : Dcppo.type} (S : D → Prop) :=
   has_bot S ∧ has_dlub S.
 
+
 Lemma admiss_has_bot {D : Dcppo.type} (S : D → Prop) : admissible S → has_bot S.
 Proof. by case. Qed.
 
 Lemma admiss_has_dlub {D : Dcppo.type} (S : D → Prop) : admissible S → has_dlub S.
 Proof. by case. Qed.
+
+
+Definition fam_adjoin_bottom {D : Dcppo.type} (A : Family D) : Family D.
+Proof.
+  exists (sum True (fam_ix A)); case.
+  + move=> _.
+    exact: ⊥.
+  + apply: A.
+Defined.
+
+Lemma fam_adjoin_bottom_directed {D : Dcppo.type} (A : Family D) (hA : is_predirected A) : is_directed (fam_adjoin_bottom A).
+Proof.
+  split.
+  - by exists (inl I).
+  - case=>//=.
+    + move=>_ [] *; by unshelve esplit; first (left + right).
+    + move=>b [] b'.
+      * by exists (inr b).
+      * case: (hA b b')=> b'' h.
+        by exists (inr b'').
+Qed.
+
+Lemma fam_adjoin_bottom_same_lub {D : Dcppo.type} (A : Family D) : is_lub A = is_lub (fam_adjoin_bottom A).
+Proof.
+  apply: funext=>x; apply: propext; split.
+  - move=> xlub; split.
+    + case; first by case.
+      by move=>?//=; apply: lub_is_ub.
+    + move=> z zub.
+      apply: lub_univ.
+      * apply: xlub.
+      * move=> i.
+        apply: zub (inr i).
+  - move=>xlub; split.
+    + move=> i.
+      rewrite (_ : A i = fam_adjoin_bottom A (inr i)); last done.
+      by apply: lub_is_ub.
+    + move=> z zub.
+      apply: lub_univ.
+      * apply: xlub.
+      * case; first by [].
+        apply: zub.
+Qed.
+
+(* Even in a constructve setting, having predirected suprema is equivalent to being admissible.
+   A priori this was a bit optimistic to expect, because it is not the case that any predirected
+   subset is (constructively) either empty or directed. *)
+
+Lemma admissible_to_has_pdlub {D : Dcppo.type} (S : D → Prop) : admissible S → has_pdlub S.
+Proof.
+  move=> admS F pdirF hF x xlub.
+  apply: admiss_has_dlub.
+  - apply: admS.
+  - apply: fam_adjoin_bottom_directed pdirF.
+  - case.
+    + by case; apply: admiss_has_bot.
+    + by apply: hF.
+  - by rewrite -fam_adjoin_bottom_same_lub.
+Qed.
+
+Lemma has_pdlub_to_admissible {D : Dcppo.type} (S : D → Prop) : has_pdlub S → admissible S.
+Proof.
+  move=> pdlubS; split.
+  - move=> x xbot.
+    unshelve apply: pdlubS.
+    + exists False; by [].
+    + by case.
+    + by case.
+    + by split.
+  - move=> F dirF hF x xlub.
+    apply: pdlubS.
+    + case: dirF=> ? pdirF.
+      exact: pdirF.
+    + apply: hF.
+    + apply: xlub.
+Qed.
 
 Lemma fp_induction {D : Dcppo.type} (S : D → Prop) (f : map D D) :
   admissible S
