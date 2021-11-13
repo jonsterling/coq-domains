@@ -51,7 +51,7 @@ Proof.
         by exists (inr k).
 Qed.
 
-Lemma fam_adjoin_elt_same_lub {D : PointedPoset.type} (A : Family D) : is_lub A = is_lub (fam_adjoin_elt A ⊥).
+Lemma fam_adjoin_bot_same_lub {D : PointedPoset.type} (A : Family D) : is_lub A = is_lub (fam_adjoin_elt A ⊥).
 Proof.
   apply: funext=> x; apply: propext; split.
   - move=> xlub.
@@ -88,7 +88,7 @@ Proof.
     + case.
       by apply: admiss_has_bot.
     + by apply: hF.
-  - by rewrite -fam_adjoin_elt_same_lub.
+  - by rewrite -fam_adjoin_bot_same_lub.
 Qed.
 
 Lemma has_pdlub_to_admissible {D : Poset.type} (S : D → Prop) : has_pdlub S → admissible S.
