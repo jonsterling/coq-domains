@@ -4,8 +4,6 @@ From Domains Require Import Preamble Preorder Poset Dcpo DcpoExponential Kleene 
 
 Set Bullet Behavior "Strict Subproofs".
 
-
-
 Definition has_dlub {D : Poset.type} (S : D → Prop) :=
   ∀ (A : Family D), is_directed A → (∀ x, S (A x)) → ∀ x, is_lub A x → S x.
 
@@ -103,7 +101,7 @@ Proof.
     + apply: xlub.
 Qed.
 
-Lemma fp_induction {D : Dcppo.type} (S : D → Prop) (f : map D D) :
+Lemma scott_induction {D : Dcppo.type} (S : D → Prop) (f : map D D) :
   admissible S
   → (∀ d, S d → S (sval f d))
   → S (fix_ f).
