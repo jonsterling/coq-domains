@@ -32,20 +32,17 @@ Proof.
   - apply: A.
 Defined.
 
-
 Lemma fam_adjoin_bot_directed {D : PointedPoset.type} (A : Family D) (hA : is_predirected A) : is_directed (fam_adjoin_elt A ⊥).
 Proof.
   split.
   - by unshelve esplit; first by left.
   - case; simpl.
     + case.
-      * case.
-        -- by exists (inl I).
-        -- move=> i.
-           exists (inr i); split; try by [].
+      * case; first by exists (inl I).
+        move=> i.
+        by exists (inr i); split.
     + move=> i; case.
-      * case.
-        exists (inr i); split; try by [].
+      * by case; exists (inr i); split.
       * move=> j.
         case: (hA i j)=> k h.
         by exists (inr k).
