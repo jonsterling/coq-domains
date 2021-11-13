@@ -69,7 +69,7 @@ Proof.
 Qed.
 
 (* Even in a constructve setting, having predirected suprema is equivalent to being admissible.
-   A priori this was a bit optimistic to expect, because it is not the case that any predirected
+   A priori this was a bit optimistic to expect, because it is not the case that every predirected
    subset is (constructively) either empty or directed. *)
 
 Lemma admissible_to_has_pdlub {D : PointedPoset.type} (S : D → Prop) : admissible S → has_pdlub S.
