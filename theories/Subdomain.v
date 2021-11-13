@@ -25,18 +25,6 @@ Proof. by case. Qed.
 Lemma admiss_has_dlub {D : Poset.type} (S : D → Prop) : admissible S → has_dlub S.
 Proof. by case. Qed.
 
-
-Definition fam_adjoin_bottom {D : Dcppo.type} (A : Family D) : Family D.
-Proof.
-  exists (sum True (fam_ix A)); case.
-  + move=> _.
-    exact: ⊥.
-  + apply: A.
-Defined.
-
-Definition is_empty {D : Poset.type} (A : Family D) : Prop :=
-  fam_ix A → False.
-
 Definition fam_adjoin_elt {D : Poset.type} (A : Family D) (x : D) : Family D.
 Proof.
   exists (sum True (fam_ix A)); case.
