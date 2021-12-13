@@ -4,10 +4,11 @@ From Domains Require Import Preamble Preorder Poset Dcpo DcpoExponential.
 
 Set Bullet Behavior "Strict Subproofs".
 
+
 (* Kleene fixed-point theorem *)
 
 Fixpoint pow {D : PointedPoset.type} (f : D -> D) n :=
-  if n is n.+1 then f (pow f n) else bottom.
+  if n is n.+1%nat then f (pow f n) else bottom.
 
 Definition pow_family {D : PointedPoset.type} (f : D -> D) : Family D.
 Proof. by exists nat; exact: pow f. Defined.
@@ -28,7 +29,7 @@ Lemma pow_chain_directed {D : PointedPoset.type} (f : D -> D) :
   is_directed (pow_family f).
 Proof.
   move=>H; split=>/=.
-  - by exists 0.
+  - by exists 0%nat.
   - move=>/= n m.
     by case: (pow_chain f n m H)=>?; [exists m | exists n].
 Qed.

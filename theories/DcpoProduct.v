@@ -15,7 +15,7 @@ Section Product.
     [apply/ltT/Hx | apply/ltT/Hy].
   Qed.
 
-  HB.instance Definition prod_preorder_axioms := PreorderOfType.Build (prod D E) prod_lt prod_ltR prod_ltT.
+  HB.instance Definition prod_preorder_axioms := IsPreorder.Build (prod D E) prod_lt prod_ltR prod_ltT.
 
   Lemma prod_ltE : ∀ p q, prod_lt p q → prod_lt q p → p = q.
   Proof.

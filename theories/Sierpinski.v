@@ -9,7 +9,7 @@ Proof. by []. Qed.
 Lemma Σ_ltT : ∀ x y z : Σ, (x → y) → (y → z) → x → z.
 Proof. by move=>???/[swap]; exact: comp. Qed.
 
-HB.instance Definition Σ_preorder_axioms := PreorderOfType.Build Σ Σ_lt Σ_ltR Σ_ltT.
+HB.instance Definition Σ_preorder_axioms := IsPreorder.Build Σ Σ_lt Σ_ltR Σ_ltT.
 
 Lemma Σ_ltE : ∀ x y : Σ, (x ≤ y) → (y ≤ x) → x = y.
 Proof. by move=> *; apply: propext. Qed.

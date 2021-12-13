@@ -3,8 +3,9 @@ From Domains Require Import Preamble Preorder Poset Dcpo.
 
 (** The "upper naturals" *)
 
+
 Definition UNat : Type :=
-  {P : nat → Prop | ∀ m n : nat, m <= n → P m → P n}.
+  {P : nat → Prop | ∀ m n : nat, (m <= n)%nat → P m → P n}.
 
 Definition UNat_defd : UNat → Prop :=
   λ x, ∃ k, sval x k.
@@ -18,7 +19,7 @@ Proof. by move=>?. Qed.
 Lemma UNat_ltT : ∀ x y z, UNat_lt x y → UNat_lt y z → UNat_lt x z.
 Proof. by move=> x y z xy yz u xu; apply/yz/xy. Qed.
 
-HB.instance Definition UNat_preorder_axioms := PreorderOfType.Build UNat UNat_lt UNat_ltR UNat_ltT.
+HB.instance Definition UNat_preorder_axioms := IsPreorder.Build UNat UNat_lt UNat_ltR UNat_ltT.
 
 Lemma UNat_ltE : ∀ x y : UNat, (x ≤ y) → (y ≤ x) → x = y.
 Proof.
@@ -34,7 +35,7 @@ Definition UNat_dsum (x : UNat) (y : ∀ u, sval x u → UNat) : UNat.
 Proof.
   unshelve esplit.
   - move=> k.
-    by exact: (∃ u v (h : sval x u), sval (y u h) v ∧ u <= k ∧ v <= k).
+    by exact: (∃ u v (h : sval x u), sval (y u h) v ∧ (u <= k)%nat ∧ (v <= k)%nat).
   - abstract
      (by move=> m n mn /= [u][v][hu][hv][um vm];
       exists u, v, hu; do!split=>//; apply: (Nat.le_trans _ m)).
