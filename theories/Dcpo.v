@@ -1,10 +1,14 @@
-From Domains Require Import Preamble Preorder Poset.
+From Domains Require Import Preamble Category Preorder Poset.
 
 HB.mixin Record DcpoOfPoset D of Poset D :=
   {ltHasDirLubs : ∀ (A : Family D), is_directed A → ∃ x, is_lub A x}.
 
 HB.structure Definition Dcpo := {D of DcpoOfPoset D & Poset D}.
 HB.structure Definition Dcppo := {D of Dcpo D & PointedPoset D}.
+
+
+
+
 
 Section DLub.
   Context {D : Dcpo.type} (A : Family D) (dir : is_directed A).
@@ -78,3 +82,36 @@ Proof.
   case: (fdlub (leq_family x y) (leq_family_directed x y xy))=> + _.
   by move/(_ true).
 Qed.
+
+
+Definition Dcpo_hom (A B : Dcpo.type) := {f : A → B | is_continuous f}.
+Notation "Dcpo.hom" := Dcpo_hom.
+
+HB.instance Definition _ := IsGraph.Build Dcpo.type Dcpo_hom.
+
+Definition Dcpo_idn (A : Dcpo.type) : A ~> A.
+Proof.
+  exists id.
+  abstract by move=> F dirF x xlub; rewrite push_fam_id.
+Defined.
+
+Definition Dcpo_seq (A B C : Dcpo.type) : A ~> B → B ~> C → A ~> C.
+Proof.
+  move=> f g.
+  exists (sval g \o sval f).
+  abstract by apply/cmp_cont/(svalP g)/(svalP f)/cont_mono/(svalP f).
+Defined.
+
+
+HB.instance Definition _ := IsPrecategory.Build Dcpo.type Dcpo_idn Dcpo_seq.
+
+Fact Dcpo_seqL : has_seqL Dcpo.type _ idn seq.
+Proof. by move=>???; apply: eq_sig. Qed.
+
+Fact Dcpo_seqR : has_seqR Dcpo.type _ idn seq.
+Proof. by move=>???; apply: eq_sig. Qed.
+
+Fact Dcpo_seqA : has_seqA Dcpo.type _ seq.
+Proof. by move=> ???????; apply: eq_sig. Qed.
+
+HB.instance Definition _ := IsCategory.Build Dcpo.type Dcpo_seqL Dcpo_seqR Dcpo_seqA.

@@ -148,6 +148,11 @@ Proof.
   by move=>?; apply/f/F.
 Defined.
 
+Lemma push_fam_id {D : Poset.type} (F : Family D) : push_fam id F = F.
+Proof.
+  dependent destruction F.
+  rewrite //=.
+Qed.
 
 Definition is_continuous {D E : Poset.type} (f : D → E) :=
   ∀ (A : Family D) (h : is_directed A) x,
