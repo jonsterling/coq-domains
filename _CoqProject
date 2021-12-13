@@ -3,6 +3,7 @@
 -arg all
 theories/Preamble.v
 theories/Category.v
+theories/Functor.v
 theories/Preorder.v
 theories/Poset.v
 theories/FilteredPoset.v

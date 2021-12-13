@@ -1,14 +1,11 @@
 From Domains Require Import Preamble.
 
-Unset Printing Notations.
-Unset Printing Implicit.
-
 HB.mixin Record IsGraph (obj : Type) :=
   {hom : obj → obj → Type}.
 
 HB.structure Definition Graph := {𝒞 of IsGraph 𝒞}.
 
-Infix "~>" := hom (at level 10).
+Infix "~>" := hom (at level 50).
 
 HB.mixin Record IsPrecategory 𝒞 of IsGraph 𝒞 :=
   {idn : ∀ x : 𝒞, x ~> x;
@@ -33,12 +30,3 @@ HB.mixin Record IsCategory 𝒞 of Precategory 𝒞 :=
    seqA : has_seqA 𝒞 hom seq}.
 
 HB.structure Definition Category := {𝒞 of IsCategory 𝒞 & IsPrecategory 𝒞 & IsGraph 𝒞}.
-
-HB.mixin Record IsFunctor (𝒞 𝒟 : Category.type) (F : 𝒞 → 𝒟) :=
-  {fmap : ∀ x y : 𝒞, x ~> y → (F x) ~> (F y);
-   fmap_id : ∀ x : 𝒞, fmap _ _ (idn x) = idn (F x);
-   fmap_seq : ∀ (x y z : 𝒞) (f : x ~> y) (g : y ~> z), fmap _ _ (seq f g) = seq (fmap _ _ f) (fmap _ _ g)}.
-
-HB.structure Definition Functor 𝒞 𝒟 := {F of IsFunctor 𝒞 𝒟 F}.
-
-Arguments fmap {𝒞 𝒟} F [x] [y] f : rename.
