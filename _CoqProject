@@ -2,8 +2,11 @@
 -arg -w
 -arg all
 theories/Preamble.v
+theories/Category.v
+theories/Functor.v
 theories/Preorder.v
 theories/Poset.v
+theories/FilteredPoset.v
 theories/Dcpo.v
 theories/DcpoExponential.v
 theories/DcpoProduct.v

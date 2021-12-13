@@ -1,12 +1,32 @@
-From Domains Require Import Preamble Preorder.
+From Domains Require Import Preamble Category Preorder.
 
 HB.mixin Record PosetOfPreorder A of Preorder A :=
   {ltE : ∀ x y : A, x ≤ y → y ≤ x → x = y}.
 
 HB.structure Definition Poset := {A of PosetOfPreorder A & Preorder A}.
 
-Definition is_monotone {D E : Poset.type} (f : D → E) :=
-  ∀ x y, x ≤ y → f x ≤ f y.
+Definition Poset_hom (A B : Poset.type) := Preorder.hom A B.
+Notation "Poset.hom" := Poset_hom.
+HB.instance Definition _ := IsGraph.Build Poset.type Poset.hom.
+
+Definition Poset_idn (A : Poset.type) : A ~> A.
+Proof. by rewrite /hom//=/Poset_hom; apply: Preorder_idn. Defined.
+
+Definition Poset_seq (A B C : Poset.type) : A ~> B → B ~> C → A ~> C.
+Proof. by rewrite /hom//=/Poset_hom; apply: Preorder_seq. Defined.
+
+HB.instance Definition _ := IsPrecategory.Build Poset.type Poset_idn Poset_seq.
+
+Fact Poset_seqL : has_seqL Poset.type _ idn seq.
+Proof. by apply: Preorder_seqL. Qed.
+
+Fact Poset_seqR : has_seqR Poset.type _ idn seq.
+Proof. by apply: Preorder_seqR. Qed.
+
+Fact Poset_seqA : has_seqA Poset.type _ seq.
+Proof. by apply: Preorder_seqA. Qed.
+
+HB.instance Definition _ := IsCategory.Build Poset.type Poset_seqL Poset_seqR Poset_seqA.
 
 #[export]
 Hint Resolve ltR : core.
@@ -128,6 +148,11 @@ Proof.
   by move=>?; apply/f/F.
 Defined.
 
+Lemma push_fam_id {D : Poset.type} (F : Family D) : push_fam id F = F.
+Proof.
+  dependent destruction F.
+  rewrite //=.
+Qed.
 
 Definition is_continuous {D E : Poset.type} (f : D → E) :=
   ∀ (A : Family D) (h : is_directed A) x,

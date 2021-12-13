@@ -35,7 +35,7 @@ Section Lift.
     by rewrite mn // no -?mn.
   Qed.
 
-  HB.instance Definition L_preorder_axioms := PreorderOfType.Build (L A) L_lt L_ltR L_ltT.
+  HB.instance Definition _ := IsPreorder.Build (L A) L_lt L_ltR L_ltT.
 
   Lemma L_make_lt (m n : L A) : (∀ x : defd m, ∃ y : defd n, m x = n y) → m ≤ n.
   Proof.

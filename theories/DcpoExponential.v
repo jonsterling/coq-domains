@@ -22,7 +22,7 @@ Section Map.
     by apply: ltT; [apply: fg | apply: gh].
   Qed.
 
-  HB.instance Definition map_preorder_axioms := PreorderOfType.Build map map_lt map_ltR map_ltT.
+  HB.instance Definition map_preorder_axioms := IsPreorder.Build map map_lt map_ltR map_ltT.
 
   Lemma map_ltE : ∀ f g : map, f ≤ g → g ≤ f → f = g.
   Proof.

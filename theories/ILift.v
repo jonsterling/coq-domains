@@ -43,7 +43,7 @@ Section Lift.
       by exists k; apply: mn0.
   Qed.
 
-  HB.instance Definition IL_preorder_axioms := PreorderOfType.Build (IL A) IL_lt IL_ltR IL_ltT.
+  HB.instance Definition IL_preorder_axioms := IsPreorder.Build (IL A) IL_lt IL_ltR IL_ltT.
 
   Lemma IL_ltE (m n : IL A) : m ≤ n → n ≤ m → m = n.
   Proof. by move=> [mn0 mn1] [nm0 nm1]; apply: IL_ext. Qed.

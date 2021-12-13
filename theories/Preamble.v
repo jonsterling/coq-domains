@@ -4,6 +4,9 @@ Require Export Coq.Logic.Description Coq.Logic.PropExtensionality Coq.Logic.Func
 
 Set Primitive Projections.
 
+Arguments proj1_sig {A P}.
+Notation sval := proj1_sig.
+
 Definition iota {X : Type} (P : X → Prop) (h : exists! x, P x) : X :=
   proj1_sig (constructive_definite_description _ h).
 
@@ -52,6 +55,7 @@ Notation Im := Im.T.
 
 Notation propext := propositional_extensionality.
 Notation funext := functional_extensionality.
+Notation depfunext := functional_extensionality_dep.
 Notation proofirr := proof_irrelevance.
 
 #[global]
