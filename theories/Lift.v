@@ -181,7 +181,7 @@ End Lift.
 
 Section Functor.
 
-  Context {A B : Type} (f : A → B).
+  Context {A B : Dcpo.type} (f : A → B) (fcont : is_continuous f).
 
   Definition fmap : L A → L B.
   Proof. by move=> x; exists (defd x) => z; apply/f/x. Defined.
@@ -189,23 +189,26 @@ Section Functor.
   Lemma fmap_cont : is_continuous fmap.
   Proof.
     move=>/= F dirF x xlub; split.
-    - move=> /= i; move=> z.
-      rewrite (_ : F i = x) //.
-      by apply: lub_is_ub xlub i z.
+    - move=> /= i; move=> zi.
+      case: (lub_is_ub _ _ xlub i zi)=> zx h.
+      exists zx.
+      rewrite /fmap//=.
+      by apply: cont_mono=>//.
     - move=> /= y yub.
       rewrite (L_dlub_rw _ _ _ x xlub).
-      apply: Σ_lub_elim=>//= i di.
-      rewrite -(yub i di) /=.
-      congr (fmap _).
-      apply: L_ext.
-      + by apply: above_lub=>//= ?.
-      + move=> ?.
-        apply: Σ_lub_intro=>//.
-        by exact: di.
-      + move=> /= Q /[dup].
-        apply: Σ_lub_elim=>//= j dj z.
-        by rewrite candidate_dlub_compute.
+      move/[dup]; apply: Σ_lub_elim=>//.
+      move=> //= i zi z'.
+      case: (yub i zi)=> zy h.
+      exists zy.
+      apply: lub_univ.
+      + apply: fcont=>//.
+        by apply: candidate_dlub_fam_directed.
+      + move=> //= j.
+        case: (yub (sval j) (svalP j))=> zy' h'.
+        by rewrite (_ : zy = zy').
   Qed.
+
+  (* TODO: fmap strict *)
 End Functor.
 
 Section Alg.
