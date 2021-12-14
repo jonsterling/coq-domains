@@ -306,13 +306,22 @@ Section Monad.
 
   Definition flatten {A} : L (L A) -> L A := bind id.
 
-  Lemma bind_monotone {A B} (f : A -> L B) : is_monotone (bind f).
+  Lemma bind_monotone {A B : Dcpo.type} (f : A -> L B) (fmono : is_monotone f) : is_monotone (bind f).
   Proof.
-    move=>/= x y H; move=>/=H0.
-    rewrite (_ : x = y) //.
-    by apply/H/(ex_proj1 H0).
+    move=>/= x y H; move=>/=[zx zfx].
+    unshelve esplit.
+    - unshelve esplit.
+      + by apply: L_lt_pi1; eauto.
+      + suff zy: defd y.
+        * apply: L_lt_pi1.
+          -- apply: fmono.
+             by apply: L_lt_pi2; eauto.
+          -- by [].
+        * by apply: L_lt_pi1; eauto.
+    - apply: L_lt_pi2.
+      apply: (fmono).
+      by apply: L_lt_pi2.
   Qed.
-
 End Monad.
 
 Section UniversalProperty.
