@@ -266,10 +266,32 @@ End Alg.
 
 
 Section Unit.
-  Context {A : Type}.
+  Context {A : Dcpo.type}.
   Definition unit : A → L A.
   Proof. move=> a; exists ⊤ => _; exact: a. Defined.
 
+  Lemma unit_cont : is_continuous unit.
+  Proof.
+    move=> F dirF x xlub; split.
+    - move=> //=i; rewrite /unit; move=> //= zi.
+      unshelve esplit=>//.
+      apply: ltT'.
+      + by apply: lub_is_ub xlub i.
+      + by [].
+    - move=> //= y.
+      case: (nonempty F dirF)=> i z.
+      move=> yub.
+      case: (yub i)=> //=.
+      + by rewrite Σ_top_rw.
+      + move=> _ zy h zx.
+        exists zy.
+        rewrite /unit//=.
+        apply: lub_univ.
+        * by apply: xlub.
+        * move=> j.
+          case: (yub j)=> zy' //= h'.
+          by rewrite (_ : zy = zy').
+  Qed.
 End Unit.
 
 Section Monad.
