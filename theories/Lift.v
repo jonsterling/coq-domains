@@ -2,6 +2,11 @@ Require Import Preamble Preorder Poset Dcpo Sierpinski.
 
 Set Primitive Projections.
 
+
+Arguments proj1_sig {A P}.
+Notation sval := proj1_sig.
+
+
 (* Using the partial map classifier, via de Jong and Escardo. *)
 Record L (A : Type) :=
   {defd : Σ;
@@ -21,45 +26,61 @@ Proof.
 Qed.
 
 Section Lift.
-  Context (A : Type).
+  Context (A : Dcpo.type).
 
   Definition L_lt (m n : L A) : Prop :=
-    defd m → m = n.
+    ∀ z : defd m, ∃ z' : defd n, m z ≤ n z'.
 
   Lemma L_ltR : ∀ m, L_lt m m.
-  Proof. by []. Qed.
+  Proof.
+    move=> m zm.
+    by exists zm.
+  Qed.
 
   Lemma L_ltT : ∀ m n o, L_lt m n → L_lt n o → L_lt m o.
   Proof.
-    move=> m n o mn no x.
-    by rewrite mn // no -?mn.
+    move=> m n o mn no=> zm.
+    case: (mn zm)=> zn mn'.
+    case: (no zn)=> zo no'.
+    exists zo.
+    apply: ltT.
+    - by apply: mn'.
+    - by [].
   Qed.
 
   HB.instance Definition L_preorder_axioms := PreorderOfType.Build (L A) L_lt L_ltR L_ltT.
-
-  Lemma L_make_lt (m n : L A) : (∀ x : defd m, ∃ y : defd n, m x = n y) → m ≤ n.
-  Proof.
-    move=> H x.
-    case: (H x) => y H'.
-    apply: L_ext; try by move=> ?.
-    move=> p z.
-    by rewrite (_ : p z = y) // (_ : z = x).
-  Qed.
-
 
   Lemma L_ltE (m n : L A) : m ≤ n → n ≤ m → m = n.
   Proof.
     move=> mn nm.
     apply: L_ext.
-    - by move=> ?; rewrite -mn.
-    - by move=> ?; rewrite -nm.
-    - move=> p x.
-      specialize (mn x).
-      dependent destruction mn.
-      by rewrite (_ : p x = x).
+    - move=> zm.
+      by case: (mn zm).
+    - move=> zn.
+      by case: (nm zn).
+    - move=> zmn zm.
+      case: (mn zm)=>zn ?.
+      case: (nm zn)=>zm'?.
+      apply: ltE.
+      + by rewrite (_ : zmn zm = zn)//=.
+      + rewrite (_ : zmn zm = zn)//.
+        by rewrite (_ : zm = zm').
   Qed.
 
   HB.instance Definition L_poset_axioms := PosetOfPreorder.Build (L A) L_ltE.
+
+  Lemma L_lt_pi1 {m n : L A} : m ≤ n → defd m → defd n.
+  Proof.
+    move=> mn zm.
+    by case: (mn zm).
+  Qed.
+
+  Lemma L_lt_pi2 {m n : L A} : m ≤ n → ∀ z z', m z ≤ n z'.
+  Proof.
+    move=> mn z z'.
+    case: (mn z)=> zn.
+    by rewrite (_ : zn = z').
+  Qed.
 
   Section Lub.
     Context (F : Family (L A)) (dirF : is_directed F).
@@ -70,29 +91,40 @@ Section Lift.
       - by case: (nonempty _ dirF).
       - move=> //= i j.
         case: (predirected _ dirF i j) => k [ik jk].
-        exists k; split; move=>?.
-        + by rewrite -ik.
-        + by rewrite -jk.
+        exists k; split; move=>zFi.
+        + by apply: (L_lt_pi1 ik).
+        + by apply: (L_lt_pi1 jk).
     Qed.
 
+    Section Candidate.
+      Context (H : dlub (push_fam (λ x : L A, defd x) F) directed_defd_fam).
 
-    Definition candidate_dlub : dlub (push_fam (λ x : L A, defd x) F) directed_defd_fam → A.
-    Proof.
-      move=> Q; apply: (iota (λ a, ∀ i x, F i x = a)); move: Q.
-      apply: Σ_lub_elim=>//.
-      move=> /= i x.
-      exists (F i x); split=>//.
-      move=> j; move: x.
-      case: (predirected _ dirF i j) => k [ik jk] x y.
-      move: {+}y {+}x.
-      rewrite (ik x) (jk y) => ??.
-      by congr (F _ _).
-    Defined.
+      Definition candidate_dlub_fam : Family A.
+      Proof.
+        unshelve esplit.
+        - exact: ({i : fam_ix F | defd (F i)}).
+        - move=> i.
+          exact: F (sval i) (svalP i).
+      Defined.
 
-    Definition candidate_dlub_compute : ∀ Q i x, F i x = candidate_dlub Q.
-    Proof. by move=> Q i x; apply: (iota_prop (λ a, ∀ i x, F i x = a)). Qed.
+      Lemma candidate_dlub_fam_directed : is_directed candidate_dlub_fam.
+      Proof.
+        split.
+        - move: H.
+          apply: Σ_lub_elim=>//= i z.
+          unshelve esplit=>//.
+          by exists i.
+        - move=> i j.
+          case: (predirected _ dirF (sval i) (sval j))=> k [ik jk].
+          unshelve esplit.
+          + by exists k; case: (ik (svalP i)).
+          + by split=>//=; apply: L_lt_pi2.
+      Qed.
 
-    Opaque candidate_dlub.
+      Definition candidate_dlub : A.
+      Proof. by apply: dlub candidate_dlub_fam_directed. Defined.
+
+    End Candidate.
 
     Definition L_dlub : L A.
     Proof.
@@ -104,22 +136,27 @@ Section Lift.
     Lemma L_dlub_is_lub : is_lub F L_dlub.
     Proof.
       split.
-      - move=> i.
-        apply: L_make_lt =>/= x.
+      - move=> i zi.
         unshelve esplit.
         + apply: Σ_lub_intro=>//.
-          by exact: x.
-        + by rewrite -(candidate_dlub_compute _ i x).
-      - move=> m H; move=> //= x.
-        apply: L_ext=>//.
-        + apply: above_lub=>//=.
-          move=> i; move=> z.
-          by rewrite -(H i z).
-        + move=> /= H' H''.
-          rewrite (_ : H'' = x) //; move: H''.
-          apply: Σ_lub_elim=>//= i z.
-          rewrite -(candidate_dlub_compute x i).
-          by move: {+}z; rewrite (H i z) => ?; congr (m _).
+          by exact: zi.
+        + rewrite /L_dlub//=.
+          rewrite /candidate_dlub//=.
+          apply: ltT'.
+          apply: lub_is_ub=>//.
+          * by exists i.
+          * rewrite /candidate_dlub_fam//=.
+            by rewrite (_ :  (svalP (exist (λ i0 : fam_ix F, defd (F i0)) i zi)) = zi)//=.
+      - move=>//= x xub.
+        move/[dup]; apply: Σ_lub_elim=>//.
+        move=> //= i zi z'.
+        case: (xub i zi)=> zx h.
+        exists zx.
+        apply: lub_univ=>//=.
+        move=> j.
+        rewrite /candidate_dlub_fam//=.
+        case: (xub (sval j) (svalP j))=> zx' h'.
+        by rewrite (_ : zx = zx')//=.
     Qed.
 
     Lemma L_ltHasDLub : ∃ m : L A, is_lub F m.
@@ -144,7 +181,7 @@ End Lift.
 
 Section Functor.
 
-  Context {A B : Type} (f : A → B).
+  Context {A B : Dcpo.type} (f : A → B) (fcont : is_continuous f).
 
   Definition fmap : L A → L B.
   Proof. by move=> x; exists (defd x) => z; apply/f/x. Defined.
@@ -152,23 +189,26 @@ Section Functor.
   Lemma fmap_cont : is_continuous fmap.
   Proof.
     move=>/= F dirF x xlub; split.
-    - move=> /= i; move=> z.
-      rewrite (_ : F i = x) //.
-      by apply: lub_is_ub xlub i z.
+    - move=> /= i; move=> zi.
+      case: (lub_is_ub _ _ xlub i zi)=> zx h.
+      exists zx.
+      rewrite /fmap//=.
+      by apply: cont_mono=>//.
     - move=> /= y yub.
       rewrite (L_dlub_rw _ _ _ x xlub).
-      apply: Σ_lub_elim=>//= i di.
-      rewrite -(yub i di) /=.
-      congr (fmap _).
-      apply: L_ext.
-      + by apply: above_lub=>//= ?.
-      + move=> ?.
-        apply: Σ_lub_intro=>//.
-        by exact: di.
-      + move=> /= Q /[dup].
-        apply: Σ_lub_elim=>//= j dj z.
-        by rewrite candidate_dlub_compute.
+      move/[dup]; apply: Σ_lub_elim=>//.
+      move=> //= i zi z'.
+      case: (yub i zi)=> zy h.
+      exists zy.
+      apply: lub_univ.
+      + apply: fcont=>//.
+        by apply: candidate_dlub_fam_directed.
+      + move=> //= j.
+        case: (yub (sval j) (svalP j))=> zy' h'.
+        by rewrite (_ : zy = zy').
   Qed.
+
+  (* TODO: fmap strict *)
 End Functor.
 
 Section Alg.
@@ -200,28 +240,58 @@ Section Alg.
     split.
     - move=>/= i.
       apply: above_lub=>//.
-      case=>// di.
-      rewrite -(lub_is_ub _ _ xlub i di).
-      by apply: lub_is_ub.
+      case=>// di//=.
+      case: (lub_is_ub _ _ xlub i di)=> zx h.
+      apply: ltT.
+      + by apply: h.
+      + by apply: (lub_is_ub (alg_fam x) (dlub (alg_fam x) (alg_fam_dir x)) _ (inl zx)).
+
     - move=> z zub /=.
       rewrite (L_dlub_rw _ _ _ x xlub).
       apply: above_lub=>//.
       case=>// /[dup]; apply: Σ_lub_elim=>//= i di u.
-      rewrite -(candidate_dlub_compute _ F dirF u i di).
+      rewrite /candidate_dlub.
+      apply: lub_univ=>//.
+      move=> //= j.
       apply: ltT'.
-      + apply: zub i.
-      + apply: ltT'.
-        * apply: lub_is_ub=>//.
-          by left.
+      + by apply: zub (sval j).
+      + simpl.
+        apply: ltT'.
+        * apply: lub_is_ub=>//=.
+          left.
+          apply: svalP j.
         * by [].
   Qed.
 End Alg.
 
 
 Section Unit.
-  Context {A : Type}.
+  Context {A : Dcpo.type}.
   Definition unit : A → L A.
   Proof. move=> a; exists ⊤ => _; exact: a. Defined.
+
+  Lemma unit_cont : is_continuous unit.
+  Proof.
+    move=> F dirF x xlub; split.
+    - move=> //=i; rewrite /unit; move=> //= zi.
+      unshelve esplit=>//.
+      apply: ltT'.
+      + by apply: lub_is_ub xlub i.
+      + by [].
+    - move=> //= y.
+      case: (nonempty F dirF)=> i z.
+      move=> yub.
+      case: (yub i)=> //=.
+      + by rewrite Σ_top_rw.
+      + move=> _ zy h zx.
+        exists zy.
+        rewrite /unit//=.
+        apply: lub_univ.
+        * by apply: xlub.
+        * move=> j.
+          case: (yub j)=> zy' //= h'.
+          by rewrite (_ : zy = zy').
+  Qed.
 End Unit.
 
 Section Monad.
@@ -236,27 +306,36 @@ Section Monad.
 
   Definition flatten {A} : L (L A) -> L A := bind id.
 
-  Lemma bind_monotone {A B} (f : A -> L B) : is_monotone (bind f).
+  Lemma bind_monotone {A B : Dcpo.type} (f : A -> L B) (fmono : is_monotone f) : is_monotone (bind f).
   Proof.
-    move=>/= x y H; move=>/=H0.
-    rewrite (_ : x = y) //.
-    by apply/H/(ex_proj1 H0).
+    move=>/= x y H; move=>/=[zx zfx].
+    unshelve esplit.
+    - unshelve esplit.
+      + by apply: L_lt_pi1; eauto.
+      + suff zy: defd y.
+        * apply: L_lt_pi1.
+          -- apply: fmono.
+             by apply: L_lt_pi2; eauto.
+          -- by [].
+        * by apply: L_lt_pi1; eauto.
+    - apply: L_lt_pi2.
+      apply: (fmono).
+      by apply: L_lt_pi2.
   Qed.
-
 End Monad.
 
 Section UniversalProperty.
 
-  Context (A : Type) (C : Dcppo.type) (f : A → C).
+  Context (A : Dcpo.type) (C : Dcppo.type) (f : A → C) (fcont : is_continuous f).
 
   Definition univ_map : L A → C := alg _ \o fmap f.
 
   Lemma univ_map_cont : is_continuous univ_map.
   Proof.
     apply: cmp_cont.
-    - apply/cont_mono/fmap_cont.
-    - apply: fmap_cont.
-    - apply: alg_cont.
+    - by apply/cont_mono/fmap_cont.
+    - by apply: fmap_cont.
+    - by apply: alg_cont.
   Qed.
 
   Lemma univ_map_strict : univ_map ⊥ = ⊥.
@@ -308,12 +387,13 @@ Section UniversalProperty.
     Proof.
       split.
       - case=> [z|[]] //=.
-        apply: L_make_lt=> /= _.
+        move=> z'.
         by exists z.
       - move=>/=y yub.
-        apply: L_make_lt => z.
+        move=> z.
         have u : (⊤ : Σ) by rewrite Σ_top_rw.
-        by rewrite -(yub (inl z) u) /=.
+        case: (yub (inl z) u)=> z' //= h.
+        by exists z'.
     Qed.
   End Fam.
 
