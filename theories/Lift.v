@@ -240,19 +240,26 @@ Section Alg.
     split.
     - move=>/= i.
       apply: above_lub=>//.
-      case=>// di.
-      rewrite -(lub_is_ub _ _ xlub i di).
-      by apply: lub_is_ub.
+      case=>// di//=.
+      case: (lub_is_ub _ _ xlub i di)=> zx h.
+      apply: ltT.
+      + by apply: h.
+      + by apply: (lub_is_ub (alg_fam x) (dlub (alg_fam x) (alg_fam_dir x)) _ (inl zx)).
+
     - move=> z zub /=.
       rewrite (L_dlub_rw _ _ _ x xlub).
       apply: above_lub=>//.
       case=>// /[dup]; apply: Σ_lub_elim=>//= i di u.
-      rewrite -(candidate_dlub_compute _ F dirF u i di).
+      rewrite /candidate_dlub.
+      apply: lub_univ=>//.
+      move=> //= j.
       apply: ltT'.
-      + apply: zub i.
-      + apply: ltT'.
-        * apply: lub_is_ub=>//.
-          by left.
+      + by apply: zub (sval j).
+      + simpl.
+        apply: ltT'.
+        * apply: lub_is_ub=>//=.
+          left.
+          apply: svalP j.
         * by [].
   Qed.
 End Alg.
