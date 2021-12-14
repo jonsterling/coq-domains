@@ -296,31 +296,16 @@ End Unit.
 
 Section Monad.
 
-  Definition bind {A B} : (A -> L B) → L A -> L B.
-  Proof.
-    move=>f [d r].
-    exists (∃ z : d, defd (f (r z)))=>y.
-    apply: (f (r (ex_proj1 y))).
-    by exact: ex_proj2 y.
-  Defined.
+  Definition bind {A B : Dcpo.type} (f : A -> L B) : L A -> L B :=
+    alg _ \o (fmap f).
 
-  Definition flatten {A} : L (L A) -> L A := bind id.
-
-  Lemma bind_monotone {A B : Dcpo.type} (f : A -> L B) (fmono : is_monotone f) : is_monotone (bind f).
+  Lemma bind_continuous {A B : Dcpo.type} (f : A → L B) (fcont : is_continuous f) : is_continuous (bind f).
   Proof.
-    move=>/= x y H; move=>/=[zx zfx].
-    unshelve esplit.
-    - unshelve esplit.
-      + by apply: L_lt_pi1; eauto.
-      + suff zy: defd y.
-        * apply: L_lt_pi1.
-          -- apply: fmono.
-             by apply: L_lt_pi2; eauto.
-          -- by [].
-        * by apply: L_lt_pi1; eauto.
-    - apply: L_lt_pi2.
-      apply: (fmono).
-      by apply: L_lt_pi2.
+    apply: cmp_cont.
+    - apply: cont_mono.
+      by apply: fmap_cont.
+    - by apply: fmap_cont.
+    - by apply: alg_cont.
   Qed.
 End Monad.
 
