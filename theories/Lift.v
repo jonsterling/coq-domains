@@ -326,16 +326,16 @@ End Monad.
 
 Section UniversalProperty.
 
-  Context (A : Type) (C : Dcppo.type) (f : A → C).
+  Context (A : Dcpo.type) (C : Dcppo.type) (f : A → C) (fcont : is_continuous f).
 
   Definition univ_map : L A → C := alg _ \o fmap f.
 
   Lemma univ_map_cont : is_continuous univ_map.
   Proof.
     apply: cmp_cont.
-    - apply/cont_mono/fmap_cont.
-    - apply: fmap_cont.
-    - apply: alg_cont.
+    - by apply/cont_mono/fmap_cont.
+    - by apply: fmap_cont.
+    - by apply: alg_cont.
   Qed.
 
   Lemma univ_map_strict : univ_map ⊥ = ⊥.
@@ -387,12 +387,13 @@ Section UniversalProperty.
     Proof.
       split.
       - case=> [z|[]] //=.
-        apply: L_make_lt=> /= _.
+        move=> z'.
         by exists z.
       - move=>/=y yub.
-        apply: L_make_lt => z.
+        move=> z.
         have u : (⊤ : Σ) by rewrite Σ_top_rw.
-        by rewrite -(yub (inl z) u) /=.
+        case: (yub (inl z) u)=> z' //= h.
+        by exists z'.
     Qed.
   End Fam.
 
