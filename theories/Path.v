@@ -104,16 +104,21 @@ End Path.
 
 
 
-Notation "Σ^Σ" := (map (HB.pack Σ) (HB.pack Σ)).
-Notation "Σ/=>" := {ϕ : Σ & {ψ : Σ | ϕ ≤ ψ}}.
+Definition Σ_fun :=
+  map (HB.pack Σ) (HB.pack Σ).
+
+Definition Σ_line :=
+  {ϕ : Σ & {ψ : Σ | ϕ ≤ ψ}}.
+
+Notation "Σ^Σ" := Σ_fun.
+Notation "Σ/=>" := Σ_line.
 
 Definition phoa_fwd : Σ^Σ → Σ/=>.
 Proof.
   move=> F.
   exists (ap F ⊥).
   exists (ap F ⊤).
-  apply: cont_mono=>//=.
-  by apply: svalP.
+  abstract by apply: cont_mono; first by apply: svalP.
 Defined.
 
 Definition phoa_bwd : Σ/=> → Σ^Σ.
@@ -122,49 +127,36 @@ Proof.
   apply: make_path h.
 Defined.
 
+Ltac replace_goal H :=
+  match goal with
+  | [|- ?G] => rewrite (_ : G = H)
+  end.
+
 Definition phoa_bwd_fwd : ∀ F, phoa_bwd (phoa_fwd F) = F.
 Proof.
   move=> F.
-  rewrite /phoa_fwd /phoa_bwd.
   apply: eq_sig=>//=.
   apply: funext=> ϕ.
   apply: propext; split.
-  - apply: (Σ_lub_elim (dlub_is_lub _ _)).
-    case=>//=.
-    + move=> u v.
-      suff: (ap F ⊤ ≤ ap F ϕ); first by apply.
-      by apply: cont_mono; first by apply: svalP.
-    + move=> _ u.
-      suff: (ap F ⊥ ≤ ap F ϕ); first by apply.
-      by apply: cont_mono; first by apply: svalP.
+  - apply: Σ_lub_elim=>//=.
+    by case=>//= ?; apply: (cont_mono (ap F))=>//=; by apply: svalP.
   - move=> x.
-
     set fam := path_fam (HB.pack Σ) ⊥ ⊤ ϕ.
     set Ffam := path_fam (HB.pack Σ) (ap F ⊥) (ap F ⊤) ϕ.
-    set dfam := path_fam_directed (HB.pack Σ )⊥ ⊤ (top_is_top ⊥) ϕ.
+    set dfam := path_fam_directed (HB.pack Σ) ⊥ ⊤ (top_is_top ⊥) ϕ.
 
-    pose Q := (ap F (dlub fam dfam)).
-    match goal with
-    | [|- ?G] =>
-      replace G with Q
-    end.
-    + suff: (ap F ϕ ≤ Q).
-      * by apply.
-      * apply: cont_mono; first by apply: svalP.
-        move=> u.
-        unshelve apply: (Σ_lub_intro _ _ _ (dlub_is_lub _ _)).
-        -- by left.
-        -- by rewrite //= Σ_top_rw.
-    + rewrite /Q; clear Q.
-
-      apply: lub_unique=>//=.
-      have R := (svalP F fam dfam (dlub fam dfam) (dlub_is_lub _ (path_fam_directed _ _ _ _ _))).
-      cbn in R.
-      rewrite (_ : Ffam = push_fam (ap F) fam); last by [].
-      rewrite /Ffam.
-      rewrite /push_fam /path_fam //=.
-      congr Build_Family.
-      apply: funext; case=>//=.
+    replace_goal (ap F (∃ i, fam i)).
+    + apply: lub_unique; first by [].
+      rewrite (_ : Ffam = push_fam (sval F) fam).
+      * by congr Build_Family; apply: funext; case.
+      * apply: (svalP F fam dfam).
+        by apply: Σ_exists_is_lub.
+    + rewrite /fam /dfam /Ffam.
+      move: x.
+      apply: (cont_mono (ap F)); first by apply: svalP.
+      move=> u.
+      exists (inl u).
+      by rewrite //= Σ_top_rw.
 Qed.
 
 Definition phoa_fwd_bwd : ∀ x, phoa_fwd (phoa_bwd x) = x.
