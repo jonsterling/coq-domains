@@ -5,7 +5,7 @@ HB.mixin Record PosetOfPreorder A of Preorder A :=
 
 HB.structure Definition Poset := {A of PosetOfPreorder A & Preorder A}.
 
-Definition is_monotone {D E : Poset.type} (f : D → E) :=
+Definition is_monotone {D E : Preorder.type} (f : D → E) :=
   ∀ x y, x ≤ y → f x ≤ f y.
 
 #[export]
