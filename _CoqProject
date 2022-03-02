@@ -15,4 +15,5 @@ theories/ClosedModality.v
 theories/Kleene.v
 theories/ILift.v
 theories/Skeleton.v
+theories/WF.v
 
