@@ -1,4 +1,4 @@
-From Domains Require Import Preamble Preorder Poset.
+From Domains Require Import Preamble Preorder Poset WF.
 
 Section Skeleton.
   Variable A : Preorder.type.
@@ -19,7 +19,7 @@ Section Skeleton.
     - by apply: ltT; eauto.
   Qed.
 
-  Instance : RelationClasses.Equivalence rel.
+  Global Instance : RelationClasses.Equivalence rel.
   Proof. by split; typeclasses eauto. Defined.
 
   Definition skel := Quotient.T A rel.
@@ -74,9 +74,87 @@ Section Skeleton.
       + by apply: yy'.
   Qed.
 
-  Lemma cls_full : forall x y : A, cls x ≤ cls y → x ≤ y.
+  Lemma cls_full : ∀ x y : A, cls x ≤ cls y → x ≤ y.
   Proof. by move=> x y; apply. Qed.
+
+  Lemma skel_lt_char : ∀ x y : A, (x ≤ y) = (cls x ≤ cls y).
+  Proof.
+    move=> x y.
+    apply: propext; split.
+    - by apply: cls_mono.
+    - by apply: cls_full.
+  Qed.
 
   Lemma cls_surj : surjective cls.
   Proof. by apply: Quotient.indp=> x; exists x. Qed.
 End Skeleton.
+
+Arguments cls [A] x.
+
+Section Wf.
+  Variable A : WfPreorder.type.
+
+  Definition skel_mem (u v : skel A) : Prop :=
+    ∀ x y, cls x = u → cls y = v → x ≺ y.
+
+
+  Lemma skel_mem_char : ∀ x y : A, (x ≺ y) = (skel_mem (cls x) (cls y)).
+  Proof.
+    move=> x y; apply: propext; split.
+    - move=> xy x' y'.
+      move=>/Quotient.eff [x'x xx'].
+      move=>/Quotient.eff [y'y yy'].
+      apply: memL.
+      + by apply: x'x.
+      + apply: memR.
+        * apply: xy.
+        * apply: yy'.
+    - by apply.
+  Qed.
+
+  Lemma skel_memT : ∀ u v w : skel A, skel_mem u v → skel_mem v w → skel_mem u w.
+  Proof.
+    apply: Quotient.indp=> x.
+    apply: Quotient.indp=> y.
+    apply: Quotient.indp=> z.
+    rewrite -?skel_mem_char.
+    apply: memT.
+  Qed.
+
+  Lemma skel_memL : ∀ u v w : skel A, u ≤ v → skel_mem v w → skel_mem u w.
+  Proof.
+    apply: Quotient.indp=> x.
+    apply: Quotient.indp=> y.
+    apply: Quotient.indp=> z.
+    rewrite -?skel_mem_char -skel_lt_char.
+    by apply: memL.
+  Qed.
+
+  Lemma skel_memR : ∀ u v w : skel A, skel_mem u v → v ≤ w → skel_mem u w.
+  Proof.
+    apply: Quotient.indp=> x.
+    apply: Quotient.indp=> y.
+    apply: Quotient.indp=> z.
+    rewrite -?skel_mem_char -skel_lt_char.
+    by apply: memR.
+  Qed.
+
+  Lemma skel_memWf : well_founded skel_mem.
+  Proof.
+    apply: Quotient.indp.
+    apply: (well_founded_induction memWf)=> x ih.
+    constructor; apply: Quotient.indp=> y hy.
+    apply: ih.
+    by rewrite skel_mem_char.
+  Qed.
+
+  Lemma skel_memLt : ∀ u v : skel A, skel_mem u v → u ≤ v.
+  Proof.
+    apply: Quotient.indp=> x.
+    apply: Quotient.indp=> y.
+    rewrite -skel_mem_char -skel_lt_char.
+    by apply: memLt.
+  Qed.
+
+  HB.instance Definition _ := HasWf.Build (skel A) skel_mem skel_memWf skel_memLt skel_memT skel_memL skel_memR.
+End Wf.
