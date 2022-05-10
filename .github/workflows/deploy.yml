@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         coq_version:
-          - '8.13'
+          - '8.15'
         ocaml_version:
           - '4.13-flambda'
       fail-fast: false  # don't stop jobs if one fails
