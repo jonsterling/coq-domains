@@ -84,4 +84,5 @@ Module AnchoredProductOrder.
     Qed.
 
     HB.instance Definition _ := HasWf.Build multi multi_mem multi_memWf multi_memLt multi_memT multi_memL multi_memR.
+  End AnchoredProductOrder.
 End AnchoredProductOrder.
