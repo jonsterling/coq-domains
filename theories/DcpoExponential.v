@@ -33,6 +33,8 @@ Section Map.
 
   HB.instance Definition map_poset_axioms := PosetOfPreorder.Build map map_ltE.
 
+
+
   Section Lub.
 
     Context (A : Family map).
@@ -70,22 +72,57 @@ Section Map.
           by apply: (dlub_is_ub (push_fam _ A)).
       Qed.
 
-      Lemma map_ltHasDLubs : ∃ f, is_lub A f.
+      Definition dlub_map : map.
+      Proof. by exists dlub_fun; apply: dlub_fun_continuous. Defined.
+
+
+      Lemma dlub_map_is_lub : is_lub A dlub_map.
       Proof.
-        unshelve esplit.
-        - by exists dlub_fun; apply: dlub_fun_continuous.
-        - split=>/=.
-          + move=> i; move=> ?.
-            by apply: (dlub_is_ub (push_fam _ _)).
-          + move=> f Hf; move=> ?.
-            apply: dlub_least => ?.
-            by apply: Hf.
+        split=>/=.
+        - move=>i; move=>?.
+          by apply: (dlub_is_ub (push_fam _ _)).
+        - move=>f Hf; move=>?.
+          apply: dlub_least=>?.
+          by apply: Hf.
       Qed.
+
+      Lemma map_ltHasDLubs : ∃ f, is_lub A f.
+      Proof. by exists dlub_map; apply: dlub_map_is_lub. Qed.
     End Map.
   End Lub.
 
   HB.instance Definition map_dcpo_axioms := DcpoOfPoset.Build map map_ltHasDLubs.
 
+
+  Lemma ap_cont2 (x : D) : is_continuous (ap^~ x).
+  Proof.
+    move=> A dirA f flub; split.
+    - by move=>//=i; apply: lub_is_ub i x.
+    - move=> y yub.
+      apply: ltT.
+      + by apply/(above_lub A f (dlub_map A dirA) flub _ x)/lub_is_ub/dlub_map_is_lub.
+      + by apply: dlub_least.
+  Qed.
 End Map.
+
+Section Pointed.
+  Context {D : Dcpo.type} {E : Dcppo.type}.
+
+  Definition map_bottom : map D E.
+  Proof.
+    unshelve esplit.
+    - move=> _.
+      apply: ⊥.
+    - by move=>*; split.
+  Defined.
+
+  Definition map_bottom_is_bottom : is_bottom map_bottom.
+  Proof. by move=>?//?. Qed.
+
+  Lemma map_has_bot : ∃ x : map D E, is_bottom x.
+  Proof. by exists map_bottom; apply: map_bottom_is_bottom. Qed.
+
+  HB.instance Definition map_pointed_poset_axioms := PointedPosetOfPoset.Build (map D E) map_has_bot.
+End Pointed.
 
 Arguments ap [D] [E].
